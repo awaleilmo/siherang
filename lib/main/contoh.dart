@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dlh/animasi/animasi.dart';
 import 'package:dlh/animasi/constant.dart';
 import 'package:dlh/main/akun.dart';
+import 'package:dlh/main/bank.dart';
 import 'package:dlh/main/berita.dart';
 import 'package:dlh/main/Link.dart';
 import 'package:dlh/main/contoh.dart';
@@ -14,9 +16,12 @@ import 'package:flutter/material.dart';
 import 'package:responsive_container/responsive_container.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'artikelpage.dart';
 class MyHomePage extends StatefulWidget{
+  final int bank;
+  MyHomePage({this.bank});
   _MyHomePage createState() => _MyHomePage();
 }
 
@@ -25,12 +30,21 @@ class _MyHomePage extends State<MyHomePage>{
   String Judul = '';
   String nmmenu ='';
   String img = '' ;
+  String users;
+  Timer timer;
+  int bank = 0;
+  int not;
   List total = new List();
   var ikon;
   var tujuan;
   @override
   void initState() {
     super.initState();
+
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) =>
+        setState(() {
+          bank = widget.bank;
+        }));
     kaon();
   }
 
@@ -39,12 +53,15 @@ class _MyHomePage extends State<MyHomePage>{
     setState(() {
       loading=true;
     });
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('id');
     final response = await http.get(linknya.urlbase + "app/pengumuman?page=1" );
     var jsson = jsonDecode(response.body);
     var data = jsson['data']['data'];
     print('program');
     setState(() {
       loading = false;
+      users = userId;
       total.addAll(data);
     });
   }
@@ -107,21 +124,21 @@ class _MyHomePage extends State<MyHomePage>{
                   Navigator.push(context, SlideRightRoute(page: LinkPage(ur: linknya.url + 'mobile/adwiyata', tit: 'Adiwiyata',)));
                 },
                 padding: EdgeInsets.all(0),
-                child: _menu(img="asset/icon/adiwiyata.png",nmmenu='Adiwiyata'),
+                child: _menu(img="asset/icon/adiwiyata.png",nmmenu='Adiwiyata',not=0),
               ),
               FlatButton(
                 onPressed: ()async{
-                  Navigator.push(context, SlideRightRoute(page: LinkPage(ur: linknya.url + 'mobile/banksampah', tit: 'Bank Sampah',)));
+                  Navigator.push(context, SlideRightRoute(page: BankPage(ur: linknya.url + 'mobile/banksampah?id=' + users, tit: 'Bank Sampah',)));
                 },
                 padding: EdgeInsets.all(0),
-                child: _menu(img="asset/icon/banksampah.png",nmmenu='Bank Sampah'),
+                child: _menu(img="asset/icon/banksampah.png",nmmenu='Bank Sampah',not=bank),
               ),
               FlatButton(
                 onPressed: ()async{
                   Navigator.push(context, SlideRightRoute(page: LinkPage(ur: linknya.url + 'mobile/pengawasan', tit: 'Pengawasan',)));
                 },
                 padding: EdgeInsets.all(0),
-                child: _menu(img="asset/icon/pengawasan.png",nmmenu='Pengawasan'),
+                child: _menu(img="asset/icon/pengawasan.png",nmmenu='Pengawasan',not=0),
               )
             ],
           ),
@@ -134,14 +151,14 @@ class _MyHomePage extends State<MyHomePage>{
                   Navigator.push(context, SlideRightRoute(page: LinkPage(ur: linknya.url + 'mobile/persampahan', tit: 'Persampahan',)));
                 },
                 padding: EdgeInsets.all(0),
-                child: _menu(img="asset/icon/persampahan.png",nmmenu='Persampahan'),
+                child: _menu(img="asset/icon/persampahan.png",nmmenu='Persampahan',not=0),
               ),
               FlatButton(
                 onPressed: ()async{
                   Navigator.push(context, SlideRightRoute(page: LinkPage(ur: linknya.url + 'mobile/tps3r', tit: 'TPS3R',)));
                 },
                 padding: EdgeInsets.all(0),
-                child: _menu(img="asset/icon/tps3r.png",nmmenu='TPS 3R'),
+                child: _menu(img="asset/icon/tps3r.png",nmmenu='TPS 3R',not=0),
               ),
 
             ],
@@ -153,32 +170,53 @@ class _MyHomePage extends State<MyHomePage>{
     );
   }
 
-  _menu(String img, String s){
+  _menu(String img,String s, int not){
     return ResponsiveContainer(
       widthPercent: 29,
       heightPercent: 15,
-      padding: EdgeInsets.all(3),
-      child: Container(
-        padding: EdgeInsets.all(5),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow:[ BoxShadow(color: Colors.grey, spreadRadius: 0.5,offset: Offset(3.0,4.0), blurRadius: 5)],
-          border: Border.all(color: ColorPalette.underlineTextField, width: 3),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child:Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-          Image.asset(
-            img,
-            fit: BoxFit.cover,
-            scale: 9.0,
+      padding: EdgeInsets.only(left: 5,right: 5),
+      child: Stack(
+        alignment: Alignment.topLeft,
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.all(2),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow:[ BoxShadow(color: Colors.grey, spreadRadius: 0.5,offset: Offset(3.0,4.0), blurRadius: 5)],
+              border: Border.all(color: ColorPalette.underlineTextField, width: 3),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child:Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+//            Icon(ikon, color: ColorPalette.underlineTextField, size: 50,),
+              Image.asset(
+                img,
+                fit: BoxFit.cover,
+                scale: 9.0,
+              ),
+              Padding(
+                padding: EdgeInsets.only(top:5),
+              ),
+              AutoSizeText(nmmenu,maxFontSize:12, minFontSize: 11,style: TextStyle(color: ColorPalette.underlineTextField, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+
+            ],
+            ),
           ),
-          Padding(
-            padding: EdgeInsets.only(top:5),
+          not == 0 ? Padding(padding: EdgeInsets.all(0),) : Container(
+            width: 20,
+            height: 20,
+            padding: EdgeInsets.all(20),
+            margin: EdgeInsets.all(2),
+            alignment: Alignment.topLeft,
+            decoration: BoxDecoration(
+              color: Colors.red,
+              boxShadow:[ BoxShadow(color: Colors.grey, spreadRadius: 0.1,offset: Offset(1.0,3.0), blurRadius: 2)],
+              border: Border.all(color: Colors.red, width: 3),
+              borderRadius: BorderRadius.circular(10),
+            ),
+
           ),
-          Text(nmmenu,style: TextStyle(color: ColorPalette.underlineTextField, fontSize: 12, fontWeight: FontWeight.bold), textAlign: TextAlign.center,)
         ],
-        ),
       ),
     );
   }

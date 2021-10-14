@@ -26,7 +26,15 @@ class _PengPage extends State<PengPage>{
   @override
   void initState(){
     super.initState();
+    notifikasi();
     kaon();
+  }
+
+  @override
+  Future<Null> notifikasi()async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('id');
+    await http.get(linknya.urlbase + "app/clearnotif?userId="+ userId +"&menu=6" );
   }
 
   @override

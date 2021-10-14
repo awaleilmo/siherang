@@ -115,7 +115,7 @@ class _MenuTk extends State<MenuTk>  {
                 </tr>
                 <tr>
                     <td>
-                        <p>Bersama Menjaga Kualitas Lingkungan Hidup Kota Serang</p></td>
+                        <p>"Terwujudnya Kota Peradaban yang Berdaya dan Berbudaya</p></td>
 
                 </tr>
                 <tr>
@@ -123,10 +123,10 @@ class _MenuTk extends State<MenuTk>  {
                 </tr>
                 <tr>
                     <td align="left">
-                        Meningkatkan kapasitas dan akuntabilitas.<br><br>
-                        Meningkatkan kualitas lingkungan hidup dan pengelolaan sumberdaya alam<br>
-                        <p style="text-align: justify">Meningkatkan kemampuan, kesadaran, kepedulian, dan partisipasi para pemangku kepentingan terhadap fungsi lingkungan hidup </p><br>
-                        <p>Meningkatkan Perekonomian Daerah dan Pemberdayaan Masyarakat yang Berdaya Saing.</p>
+                        Menguatkan Peradaban Berbasis Nilai-Nilai Kemanusiaan.<br><br>
+                        Meningkatkan Sarana Prasarana Daerah yang Berwawasan Lingkungan.<br>
+                        <p style="text-align: justify">Meningkatkan Perekonomian Daerah dan Pemberdayaan Masyarakat yang Berdaya Saing. </p><br>
+                        <p>Meningkatkan Tata Kelola Pemerintahan yang Baik  .</p>
                         </td>
 
                 </tr>
@@ -204,14 +204,14 @@ class _MenuTk extends State<MenuTk>  {
                       },
                       child:_btnmnu(nmmenu = 'PEP dan Keuangan'),
                     ),
-                    FlatButton(
-                      padding: EdgeInsets.only(left: 5,right: 5),
-                      onPressed: (){
-                        webView.reload();
-                        webView.loadUrl(linknya.url + 'mobile/ppklh');
-                      },
-                      child:_btnmnu(nmmenu = 'Bidang Pengendalian'),
-                    ),
+//                    FlatButton(
+//                      padding: EdgeInsets.only(left: 5,right: 5),
+//                      onPressed: (){
+//                        webView.reload();
+//                        webView.loadUrl(linknya.url + 'mobile/ppklh');
+//                      },
+//                      child:_btnmnu(nmmenu = 'Bidang Pengendalian'),
+//                    ),
 
 //                    FlatButton(
 //                      padding: EdgeInsets.only(left: 5,right: 5),

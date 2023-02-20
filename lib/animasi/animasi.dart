@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 class SlideRightRoute extends PageRouteBuilder {
   final Widget page;
-  SlideRightRoute({this.page})
+  SlideRightRoute({required this.page})
       : super(
     pageBuilder: (
         BuildContext context,
@@ -26,7 +26,7 @@ class SlideRightRoute extends PageRouteBuilder {
 }
 class SlideLeftRoute extends PageRouteBuilder {
   final Widget page;
-  SlideLeftRoute({this.page})
+  SlideLeftRoute({required this.page})
       : super(
     pageBuilder: (
         BuildContext context,
@@ -51,7 +51,7 @@ class SlideLeftRoute extends PageRouteBuilder {
 }
 class FadeRoute extends PageRouteBuilder {
   final Widget page;
-  FadeRoute({this.page})
+  FadeRoute({required this.page})
       : super(
     pageBuilder: (
         BuildContext context,
@@ -73,7 +73,7 @@ class FadeRoute extends PageRouteBuilder {
 }
 class ScaleRoute extends PageRouteBuilder {
   final Widget page;
-  ScaleRoute({this.page})
+  ScaleRoute({required this.page})
       : super(
     pageBuilder: (
         BuildContext context,

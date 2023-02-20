@@ -8,32 +8,34 @@ import 'package:dlh/main/artikelpage.dart';
 import 'package:dlh/main/galeri/video.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:responsive_container/responsive_container.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-class GaleriPage extends StatefulWidget{
+class GaleriPage extends StatefulWidget {
   final int foto;
   final int video;
-  GaleriPage({this.foto, this.video});
+
+  GaleriPage({required this.foto, required this.video});
+
   @override
   _GaleriPage createState() => _GaleriPage();
 }
 
-class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
+class _GaleriPage extends State<GaleriPage>
+    with SingleTickerProviderStateMixin {
   int _counter = 1;
-  Timer timer;
+  late Timer timer;
   int _counterpe = 1;
-  List total = new List();
-  List Peng = new List();
+  List total = [];
+  List Peng = [];
   int wartas = 0;
-  int pengumuman = 0 ;
-  String Judul='';
+  int pengumuman = 0;
+
+  String Judul = '';
   ScrollController _scrollController = new ScrollController();
   ScrollController _scroll2Controller = new ScrollController();
   bool _loadingMore = false;
-  TabController knt;
+  late TabController knt;
 
   @override
   Future<void> _incrementCounter() async {
@@ -41,7 +43,9 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
       _counter++;
       _loadingMore = true;
     });
-    final response = await http.get(linknya.urlbase + "app/foto?page=" + _counter.toString());
+    var url = Uri.https(linknya.urlbase , "app/foto?page=" + _counter.toString());
+    final response = await http
+        .get(url);
     var jsson = jsonDecode(response.body);
     var data = jsson['data']['data'];
     setState(() {
@@ -56,7 +60,9 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
       _counterpe++;
       _loadingMore = true;
     });
-    final response = await http.get(linknya.urlbase + "app/video?page=" + _counterpe.toString());
+    var url =Uri.https(linknya.urlbase , "app/video?page=" + _counterpe.toString());
+    final response = await http
+        .get(url);
     var jsson = jsonDecode(response.body);
     var data = jsson['data']['data'];
 
@@ -68,16 +74,20 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
 
   @override
   Future<void> warta() async {
-    if(!_loadingMore){
+    if (!_loadingMore) {
       setState(() {
         _loadingMore = true;
       });
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      String userId = prefs.getString('id');
-      final response = await http.get(linknya.urlbase + "app/foto?page=" + _counter.toString());
+      String userId = prefs.getString('id') ?? '';
+      var url1 = Uri.https(linknya.urlbase , "app/foto?page=" + _counter.toString());
+      final response = await http
+          .get(url1);
       var jsson = jsonDecode(response.body);
       var data = jsson['data']['data'];
-      final response1 = await http.get(linknya.urlbase + "app/video?page=" + _counterpe.toString());
+      var url2 = Uri.https(linknya.urlbase , "app/video?page=" + _counterpe.toString());
+      final response1 = await http
+          .get(url2);
       var jsson1 = jsonDecode(response1.body);
       var data1 = jsson1['data']['data'];
 
@@ -91,15 +101,17 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
 
   @override
   Future<Null> _refreshberita() async {
-    if(!_loadingMore){
+    if (!_loadingMore) {
       setState(() {
         _loadingMore = true;
         _counter = 1;
       });
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      String userId = prefs.getString('id');
-      String userToken = prefs.getString('token');
-      final response = await http.get(linknya.urlbase + "app/foto?page=" + _counter.toString());
+      String userId = prefs.getString('id') ?? '';
+      String userToken = prefs.getString('token') ?? '';
+      var url = Uri.https(linknya.urlbase , "app/foto?page=" + _counter.toString());
+      final response = await http
+          .get(url);
       var jsson = jsonDecode(response.body);
       var data = jsson['data']['data'];
       print(_counter);
@@ -111,16 +123,18 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
   }
 
   @override
-  Future<Null> _refreshpengumuman () async {
-    if(!_loadingMore){
+  Future<Null> _refreshpengumuman() async {
+    if (!_loadingMore) {
       setState(() {
         _loadingMore = true;
         _counterpe = 1;
       });
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      String userId = prefs.getString('id');
-      String userToken = prefs.getString('token');
-      final response1 = await http.get(linknya.urlbase + "app/video?page=" + _counterpe.toString());
+      String userId = prefs.getString('id') ?? '';
+      String userToken = prefs.getString('token') ?? '';
+      var url = Uri.https(linknya.urlbase , "app/video?page=" + _counterpe.toString());
+      final response1 = await http
+          .get(url);
       var jsson1 = jsonDecode(response1.body);
       var data1 = jsson1['data']['data'];
       print(_counter);
@@ -133,60 +147,74 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
 
   @override
   void initState() {
-
     super.initState();
 
     warta();
-    _scrollController.addListener((){
-      if(_scrollController.position.pixels == _scrollController.position.maxScrollExtent)
-        _incrementCounter();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) _incrementCounter();
     });
-    _scroll2Controller.addListener((){
-      if(_scroll2Controller.position.pixels == _scroll2Controller.position.maxScrollExtent)
-        _incrementpe();
+    _scroll2Controller.addListener(() {
+      if (_scroll2Controller.position.pixels ==
+          _scroll2Controller.position.maxScrollExtent) _incrementpe();
     });
     knt = TabController(vsync: this, length: 2);
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) => setState((){
-      wartas = widget.foto;
-      pengumuman = widget.video;
-    }));
-
+    timer = Timer.periodic(
+        Duration(seconds: 1),
+        (Timer t) => setState(() {
+              wartas = widget.foto;
+              pengumuman = widget.video;
+            }));
   }
 
   @override
-  Future<Null> notifikasi()async{
+  Future<Null> notifikasi() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = prefs.getString('id');
-    await http.get(linknya.urlbase + "app/clearnotif?userId="+ userId +"&menu=4" );
+    String userId = prefs.getString('id') ?? '';
+    var url = Uri.https(linknya.urlbase , "app/clearnotif?userId=" + userId + "&menu=4");
+    await http
+        .get(url);
   }
 
   @override
-  Future<Null> notifikasi2()async{
+  Future<Null> notifikasi2() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = prefs.getString('id');
-    await http.get(linknya.urlbase + "app/clearnotif?userId="+ userId +"&menu=5" );
+    String userId = prefs.getString('id') ?? '';
+    var url = Uri.https(linknya.urlbase , "app/clearnotif?userId=" + userId + "&menu=5");
+    await http
+        .get(url);
   }
 
   @override
-  void dispose(){
+  void dispose() {
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return  Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        leading: Padding(padding: EdgeInsets.only(left: 0),),
+        leading: Padding(
+          padding: EdgeInsets.only(left: 0),
+        ),
         iconTheme: IconThemeData(color: ColorPalette.underlineTextField),
-        title: ResponsiveContainer(widthPercent: 60,heightPercent: 4.5, child: Text('Galeri', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22), textAlign: TextAlign.center,),),
+        title: Container(
+          width: MediaQuery.of(context).size.width * 0.60,
+          height: MediaQuery.of(context).size.height * 0.045,
+          child: Text(
+            'Galeri',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+            textAlign: TextAlign.center,
+          ),
+        ),
         backgroundColor: ColorPalette.underlineTextField,
-        bottom:_tabBar(),
+        bottom: _tabBar(),
       ),
-      body:  ResponsiveContainer(
+      body: Container(
         margin: EdgeInsets.all(10),
-        widthPercent: 100,
-        heightPercent: 100,
+        width: MediaQuery.of(context).size.width * 0.100,
+        height: MediaQuery.of(context).size.height * 0.100,
         child: TabBarView(
           controller: knt,
           physics: NeverScrollableScrollPhysics(),
@@ -199,12 +227,10 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
               child: _list2(),
               onRefresh: _refreshpengumuman,
             ),
-
           ],
         ),
       ),
-    )
-    ;
+    );
   }
 
   _buildProgressIndicator() {
@@ -219,77 +245,110 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
     );
   }
 
-  _tabBar(){
+  _tabBar() {
     return TabBar(
       controller: knt,
       tabs: <Widget>[
-        Tab ( child: Stack(alignment: Alignment.topRight, children: <Widget>[
-          AutoSizeText('Foto   ',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
-          wartas <= 0 ? Padding(padding: EdgeInsets.all(0),) : Container(
-            width: 10,
-            height: 10,
-            padding: EdgeInsets.all(0),
-            margin: EdgeInsets.only(left: 10),
-
-            decoration: BoxDecoration(
-              color: Colors.red,
-              boxShadow:[ BoxShadow(color: Colors.grey, spreadRadius: 0.1,offset: Offset(1.0,3.0), blurRadius: 2)],
-              border: Border.all(color: Colors.red, width: 3),
-              borderRadius: BorderRadius.circular(10),
+        Tab(
+            child: Stack(
+          alignment: Alignment.topRight,
+          children: <Widget>[
+            AutoSizeText(
+              'Foto   ',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-
-          )
-        ],) ),
-        Tab (  child: Stack(alignment: Alignment.topRight, children:<Widget>[
-          AutoSizeText('Video   ',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),),
-          pengumuman <= 0 ? Padding(padding: EdgeInsets.all(0),) : Container(
-            width: 10,
-            height: 10,
-            padding: EdgeInsets.all(20),
-            margin: EdgeInsets.all(2),
-            alignment: Alignment.topLeft,
-            decoration: BoxDecoration(
-              color: Colors.red,
-              boxShadow:[ BoxShadow(color: Colors.grey, spreadRadius: 0.1,offset: Offset(1.0,3.0), blurRadius: 2)],
-              border: Border.all(color: Colors.red, width: 3),
-              borderRadius: BorderRadius.circular(10),
+            wartas <= 0
+                ? Padding(
+                    padding: EdgeInsets.all(0),
+                  )
+                : Container(
+                    width: 10,
+                    height: 10,
+                    padding: EdgeInsets.all(0),
+                    margin: EdgeInsets.only(left: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey,
+                            spreadRadius: 0.1,
+                            offset: Offset(1.0, 3.0),
+                            blurRadius: 2)
+                      ],
+                      border: Border.all(color: Colors.red, width: 3),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  )
+          ],
+        )),
+        Tab(
+          child: Stack(alignment: Alignment.topRight, children: <Widget>[
+            AutoSizeText(
+              'Video   ',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.white),
             ),
-
-          )
-        ]), ),
+            pengumuman <= 0
+                ? Padding(
+                    padding: EdgeInsets.all(0),
+                  )
+                : Container(
+                    width: 10,
+                    height: 10,
+                    padding: EdgeInsets.all(20),
+                    margin: EdgeInsets.all(2),
+                    alignment: Alignment.topLeft,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey,
+                            spreadRadius: 0.1,
+                            offset: Offset(1.0, 3.0),
+                            blurRadius: 2)
+                      ],
+                      border: Border.all(color: Colors.red, width: 3),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  )
+          ]),
+        ),
       ],
     );
   }
 
-  _list(){
+  _list() {
     return ListView.builder(
-      itemCount: Peng == null ? 2: Peng.length + 1 ,
+      itemCount: Peng == null ? 2 : Peng.length + 1,
       scrollDirection: Axis.vertical,
-      itemBuilder: (BuildContext context, int index)
-      {
+      itemBuilder: (BuildContext context, int index) {
         if (index == Peng.length) {
           notifikasi();
           return _buildProgressIndicator();
-        }else{
+        } else {
           return InkWell(
             onTap: () {
-              Navigator.push(context, SlideRightRoute(page: ArtikelPage(
-                  id: Peng[index]['id'],
-                  judul: Judul = 'Foto',
-                  tipe: 1)));
+              Navigator.push(
+                  context,
+                  SlideRightRoute(
+                      page: ArtikelPage(
+                          id: Peng[index]['id'],
+                          judul: Judul = 'Foto',
+                          tipe: 1)));
               print('ok');
             },
-            child:  ResponsiveContainer(
+            child: Container(
               margin: EdgeInsets.only(bottom: 20),
-              widthPercent: 90,
-              heightPercent: 34,
+              width: MediaQuery.of(context).size.width * 0.90,
+              height: MediaQuery.of(context).size.height * 0.34,
               child: Container(
                 alignment: Alignment.topLeft,
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     color: ColorPalette.underlineTextField,
-                    borderRadius: BorderRadius.circular(5)
-                ),
+                    borderRadius: BorderRadius.circular(5)),
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   verticalDirection: VerticalDirection.up,
@@ -298,32 +357,40 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        ResponsiveContainer(
-                          widthPercent: 90,
-                          heightPercent: 25,
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.90,
+                          height: MediaQuery.of(context).size.height * 0.25,
                           child: Container(
                             alignment: Alignment.center,
                             decoration: new BoxDecoration(
                                 borderRadius: new BorderRadius.circular(5),
                                 image: new DecorationImage(
-                                    image: NetworkImage('http://dlh-serangkota.com/upload/galeri/foto/' + Peng[index]['file'], scale: 1.0),
-                                    fit: BoxFit.cover
-                                )
+                                    image: NetworkImage(
+                                        '${linknya.url}upload/galeri/foto/' +
+                                            Peng[index]['file'],
+                                        scale: 1.0),
+                                    fit: BoxFit.cover)),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 5),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.90,
+                          height: MediaQuery.of(context).size.height * 0.05,
+                          child: SizedBox(
+                            child: AutoSizeText(
+                              Peng[index]['judul'],
+                              maxLines: 2,
+                              style: TextStyle(
+                                  fontSize: 22,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
-                        Padding(padding: EdgeInsets.only(top: 5),),
-                        ResponsiveContainer(
-                          widthPercent: 90, heightPercent: 5, child: SizedBox(
-
-                          child: AutoSizeText(
-                            Peng[index]['judul'], maxLines: 2, style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),),),),
-
                       ],
                     ),
-
-
-
                   ],
                 ),
               ),
@@ -335,35 +402,36 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
     );
   }
 
-  _list2(){
+  _list2() {
     return ListView.builder(
-
-      itemCount: total == null? 1:total.length + 1 ,
+      itemCount: total == null ? 1 : total.length + 1,
       scrollDirection: Axis.vertical,
       itemBuilder: (BuildContext context, int index) {
         if (index == total.length) {
           notifikasi2();
           return _buildProgressIndicator();
-        }else {
+        } else {
           return InkWell(
             onTap: () {
-              Navigator.push(context, SlideRightRoute(page: VideoPage(
-                  ur: total[index]['id'],
-                  tit: total[index]['judul'],
-              )));
+              Navigator.push(
+                  context,
+                  SlideRightRoute(
+                      page: VideoPage(
+                    ur: total[index]['id'],
+                    tit: total[index]['judul'],
+                  )));
               print('ok');
             },
-            child: ResponsiveContainer(
+            child: Container(
               margin: EdgeInsets.only(bottom: 20),
-              widthPercent: 90,
-              heightPercent: 34,
+              width: MediaQuery.of(context).size.width * 0.90,
+              height: MediaQuery.of(context).size.height * 0.34,
               child: Container(
                 alignment: Alignment.topLeft,
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     color: ColorPalette.underlineTextField,
-                    borderRadius: BorderRadius.circular(5)
-                ),
+                    borderRadius: BorderRadius.circular(5)),
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   verticalDirection: VerticalDirection.up,
@@ -372,34 +440,47 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-
-                        ResponsiveContainer(
-                          widthPercent: 90,
-                          heightPercent: 25,
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.90,
+                          height: MediaQuery.of(context).size.height * 0.25,
                           alignment: Alignment.topLeft,
                           child: Container(
                             alignment: Alignment.center,
                             decoration: new BoxDecoration(
                                 borderRadius: new BorderRadius.circular(5),
                                 image: new DecorationImage(
-                                    image: NetworkImage('http://img.youtube.com/vi/'+ total[index]['link'] +'/mqdefault.jpg', scale: 1.0),
-                                    fit: BoxFit.cover
-                                )
+                                    image: NetworkImage(
+                                        'http://img.youtube.com/vi/' +
+                                            total[index]['link'] +
+                                            '/mqdefault.jpg',
+                                        scale: 1.0),
+                                    fit: BoxFit.cover)),
+                            child: Icon(
+                              Icons.play_circle_filled,
+                              size: 100,
+                              color: ColorPalette.underlineTextField,
                             ),
-                            child: Icon(Icons.play_circle_filled,size: 100, color: ColorPalette.underlineTextField,),
                           ),
                         ),
-                        Padding(padding: EdgeInsets.only(top: 5),),
-                        ResponsiveContainer(
-                          widthPercent: 90, heightPercent: 5, child: SizedBox(
-
-                          child: AutoSizeText(
-                            total[index]['judul'], maxLines: 2, style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),),),),
-
+                        Padding(
+                          padding: EdgeInsets.only(top: 5),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.90,
+                          height: MediaQuery.of(context).size.height * 0.05,
+                          child: SizedBox(
+                            child: AutoSizeText(
+                              total[index]['judul'],
+                              maxLines: 2,
+                              style: TextStyle(
+                                  fontSize: 22,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-
-
                   ],
                 ),
               ),
@@ -410,5 +491,4 @@ class _GaleriPage extends State<GaleriPage> with SingleTickerProviderStateMixin{
       controller: _scroll2Controller,
     );
   }
-
 }

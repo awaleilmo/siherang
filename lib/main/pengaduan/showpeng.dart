@@ -8,7 +8,6 @@ import 'package:dlh/main/pengaduan/pengaduan.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:responsive_container/responsive_container.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PengPage extends StatefulWidget{
@@ -19,7 +18,7 @@ class PengPage extends StatefulWidget{
 
 class _PengPage extends State<PengPage>{
   int _counter = 0;
-  List total = new List();
+  List total = [];
   bool loading = false;
 
 
@@ -33,8 +32,9 @@ class _PengPage extends State<PengPage>{
   @override
   Future<Null> notifikasi()async{
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = prefs.getString('id');
-    await http.get(linknya.urlbase + "app/clearnotif?userId="+ userId +"&menu=6" );
+    String userId = prefs.getString('id') ?? '';
+    var url  = Uri.https(linknya.urlbase , "app/clearnotif?userId="+ userId +"&menu=6");
+    await http.get(url);
   }
 
   @override
@@ -43,8 +43,9 @@ class _PengPage extends State<PengPage>{
       loading = true;
     });
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = prefs.getString('id');
-    final response = await http.get(linknya.urlbase + "app/showpengaduan?userId=" + userId);
+    String userId = prefs.getString('id') ?? '';
+    var url = Uri.https(linknya.urlbase , "app/showpengaduan?userId=" + userId);
+    final response = await http.get(url);
     var jsson = jsonDecode(response.body);
     var datat = jsson['data'];
     //print(datat);
@@ -60,8 +61,9 @@ class _PengPage extends State<PengPage>{
       loading = true;
     });
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = prefs.getString('id');
-    final response = await http.get(linknya.urlbase + "app/showpengaduan?userId=" + userId);
+    String userId = prefs.getString('id') ?? '';
+    var url = Uri.https(linknya.urlbase , "app/showpengaduan?userId=" + userId);
+    final response = await http.get(url);
     var jsson = jsonDecode(response.body);
     var datat = jsson['data'];
     setState(() {
@@ -80,22 +82,25 @@ class _PengPage extends State<PengPage>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: ResponsiveContainer(widthPercent: 60,heightPercent: 4.5, child: Text('Pengaduan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22), textAlign: TextAlign.center,),),
+        title: Container(
+          width: MediaQuery.of(context).size.width * 0.60,
+          height: MediaQuery.of(context).size.height * 0.045,
+          child: Text('Pengaduan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22), textAlign: TextAlign.center,),),
         backgroundColor: ColorPalette.underlineTextField,
       ),
       body:loading == true ? _buildProgressIndicator(): RefreshIndicator(
         child: _list2(),
         onRefresh: kaon1,
       ),
-      floatingActionButton: RaisedButton(
+      floatingActionButton: MaterialButton(
         onPressed: (){
           Navigator.push(context, SlideRightRoute(page: PengaduanMaps()));
         },
         color: ColorPalette.underlineTextField,
         padding: EdgeInsets.all(10),
-        child: ResponsiveContainer(
-          widthPercent: 25,
-          heightPercent: 5,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.25,
+          height: MediaQuery.of(context).size.width * 0.05,
           child: AutoSizeText('Tambah Pengaduan',style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
@@ -116,10 +121,10 @@ class _PengPage extends State<PengPage>{
              Navigator.push(context, SlideRightRoute(page: DetailPeng(idnya: total[index]['id'],)));
               print('ok');
             },
-            child: ResponsiveContainer(
+            child: Container(
               margin: EdgeInsets.only(top: 20, left: 10, right: 10),
-              widthPercent: 90,
-              heightPercent: 25,
+              width: MediaQuery.of(context).size.width * 0.90,
+              height: MediaQuery.of(context).size.height * 0.25,
               child: Container(
                 alignment: Alignment.topLeft,
                 padding: EdgeInsets.all(10),
@@ -137,13 +142,13 @@ class _PengPage extends State<PengPage>{
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        ResponsiveContainer(
-                          widthPercent: 50, heightPercent: 3, child: SizedBox(
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.50, height: MediaQuery.of(context).size.height * 0.3, child: SizedBox(
                           child: AutoSizeText(
                             "Nama Pengadu", maxLines: 2,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14,color: Colors.white),),),
                         ),
-                        ResponsiveContainer(
-                          widthPercent: 50, heightPercent: 3, child: SizedBox(
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.50, height: MediaQuery.of(context).size.height * 0.3, child: SizedBox(
                           child: Container(
                             decoration: BoxDecoration(
                                 border: Border(bottom: BorderSide(color: Colors.white))
@@ -154,14 +159,14 @@ class _PengPage extends State<PengPage>{
 
                           ,),
                         ),
-                        ResponsiveContainer(
+                        Container(
                           margin: EdgeInsets.only(top: 10),
-                          widthPercent: 50, heightPercent: 3, child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.50, height: MediaQuery.of(context).size.height * 0.3, child: SizedBox(
                           child: AutoSizeText(
                             "Tanggal Pengaduan", maxLines: 2,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14,color: Colors.white),),),
                         ),
-                        ResponsiveContainer(widthPercent: 50,
-                          heightPercent: 2,
+                        Container(width: MediaQuery.of(context).size.width * 0.50,
+                          height: MediaQuery.of(context).size.height * 0.2,
                           alignment: Alignment.bottomLeft,
                           child: SizedBox(
                             child: Container(
@@ -175,14 +180,14 @@ class _PengPage extends State<PengPage>{
                             ),
                           ),
                         ),
-                        ResponsiveContainer(
+                        Container(
                           margin: EdgeInsets.only(top: 10),
-                          widthPercent: 50, heightPercent: 3, child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.50, height: MediaQuery.of(context).size.height * 0.3, child: SizedBox(
                           child: AutoSizeText(
                             "Status", maxLines: 2,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14,color: Colors.white),),),
                         ),
-                        ResponsiveContainer(widthPercent: 50,
-                          heightPercent: 2,
+                        Container(width: MediaQuery.of(context).size.width * 0.50,
+                          height: MediaQuery.of(context).size.height * 0.2,
                           alignment: Alignment.bottomLeft,
                           child: SizedBox(
                             child: AutoSizeText(
@@ -193,9 +198,9 @@ class _PengPage extends State<PengPage>{
                       ],
                     ),
                     Padding(padding: EdgeInsets.only(left: 5),),
-                    ResponsiveContainer(
-                      widthPercent: 35,
-                      heightPercent: 100,
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.35,
+                      height: MediaQuery.of(context).size.height * 0.100,
                       alignment: Alignment.topLeft,
                       child: Container(
                         alignment: Alignment.center,

@@ -1,19 +1,19 @@
 import 'dart:convert';
 
+import 'package:dlh/based/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:responsive_container/responsive_container.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'dart:async';
 
 import 'animasi/animasi.dart';
 import 'animasi/constant.dart';
-import 'login/login.dart';
-import 'login/register.dart';
-import 'main/menu.dart';
-import 'dart:io';
+// import 'login/login.dart';
+// import 'login/register.dart';
+// import 'main/menu.dart';
 import 'package:http/http.dart' as http;
 void main() => runApp(MyApp());
 
@@ -27,8 +27,11 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+      ),
+      initialRoute: '/splashscreen',
+      routes: routes.data,
       title: "DLH Kota Serang",
-      home: SplashScreenPage(),
     );
   }
 }
@@ -62,57 +65,64 @@ class _SplashScreenPageState extends State<SplashScreenPage>{
           setState(() {
             isLoading = true;
           });
-          final response = await http.get(linknya.url).timeout(Duration(seconds: 10));
+          var url = Uri.https(linknya.url);
+          await http.get(url).timeout(Duration(seconds: 10));
           final SharedPreferences prefs = await SharedPreferences.getInstance();
-          String userId = prefs.getString('id');
-          String userToken = prefs.getString('token');
+          String userId = prefs.getString('id') ?? '';
           startSplashScreen();
           if (userId != null) {
             isLoading = false;
             print('auto login ok');
             setState(() {
               autol = true;
-              userId = prefs.getString('id');
+              userId = prefs.getString('id') ?? '';
             });
             return;
           }
         }
     } on TimeoutException catch (e) {
-      Alert(
-        context: context,
-        type: AlertType.warning,
-        title: "",
-        desc: "Cek Koneksi Internet Anda.",
-        closeFunction: () => exit(0),
-        buttons: [
-          DialogButton(
-            child: Text(
-              "Back",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            onPressed: () => exit(0),
-            width: 120,
-          )
-        ],
-      ).show();
+      // showTopSnackBar(
+      //   context as OverlayState,
+      //   CustomSnackBar.error(
+      //     message:
+      //     "Cek Koneksi Internet Anda.",
+      //   ),
+      // );
+      // Alert(
+      //   context: context,
+      //   type: AlertType.warning,
+      //   title: "",
+      //   desc: "Cek Koneksi Internet Anda.",
+      //   closeFunction: () => exit(0),
+      //   buttons: [
+      //     DialogButton(
+      //       child: Text(
+      //         "Back",
+      //         style: TextStyle(color: Colors.white, fontSize: 20),
+      //       ),
+      //       onPressed: () => exit(0),
+      //       width: 120,
+      //     )
+      //   ],
+      // ).show();
     } on Error catch (e) {
-      Alert(
-        context: context,
-        type: AlertType.error,
-        title: "Terjadi Kesalahan",
-        desc: "Cek Koneksi Internet Anda.",
-        closeFunction: () => exit(0),
-        buttons: [
-          DialogButton(
-            child: Text(
-              "Back",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            onPressed: () => exit(0),
-            width: 120,
-          )
-        ],
-      ).show();
+      // Alert(
+      //   context: context,
+      //   type: AlertType.error,
+      //   title: "Terjadi Kesalahan",
+      //   desc: "Cek Koneksi Internet Anda.",
+      //   closeFunction: () => exit(0),
+      //   buttons: [
+      //     DialogButton(
+      //       child: Text(
+      //         "Back",
+      //         style: TextStyle(color: Colors.white, fontSize: 20),
+      //       ),
+      //       onPressed: () => exit(0),
+      //       width: 120,
+      //     )
+      //   ],
+      // ).show();
     }
 
   }
@@ -122,7 +132,8 @@ class _SplashScreenPageState extends State<SplashScreenPage>{
     var durasi = const Duration(seconds: 3);
     return Timer(durasi, (){
       Navigator.of(context).pushReplacement(
-        ScaleRoute(page: autol ? HomePage() : Utama()),
+        // ScaleRoute(page: autol ? HomePage() : Utama()),
+        ScaleRoute(page: Utama()),
       );
     });
   }
@@ -136,9 +147,9 @@ class _SplashScreenPageState extends State<SplashScreenPage>{
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ResponsiveContainer(
-              widthPercent: 55,
-              heightPercent: 30,
+            Container(
+              width: MediaQuery.of(context).size.width * 0.55,
+              height: MediaQuery.of(context).size.height * 0.30,
               child: Image.asset(
                 "asset/siherang.png",
                   fit: BoxFit.cover,
@@ -187,7 +198,7 @@ class Utama extends StatelessWidget{
         ),
         child:ListView(
           children: <Widget>[
-            _iconLogin(),
+            _iconLogin(context),
             _buildButton(context)
           ],
         ),
@@ -195,10 +206,10 @@ class Utama extends StatelessWidget{
     ) ;
   }
 
-  Widget _iconLogin(){
-    return ResponsiveContainer(
-      widthPercent: 100,
-      heightPercent: 40,
+  Widget _iconLogin(context){
+    return Container(
+      width: MediaQuery.of(context).size.width * 1,
+      height: MediaQuery.of(context).size.height * 0.40,
       child: Container(
         padding: EdgeInsets.only(top:20.0, bottom: 20),
         width: double.infinity,
@@ -224,7 +235,7 @@ class Utama extends StatelessWidget{
         ),
         InkWell(
           onTap:  (){
-            Navigator.push(context, SlideLeftRoute(page: LoginPage()));
+            // Navigator.push(context, SlideLeftRoute(page: LoginPage()));
           },
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 15.0),
@@ -245,7 +256,7 @@ class Utama extends StatelessWidget{
         ),
         InkWell(
           onTap: (){
-            Navigator.push(context, SlideLeftRoute(page: RegisterPage()));
+            // Navigator.push(context, SlideLeftRoute(page: RegisterPage()));
           },
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 15.0),

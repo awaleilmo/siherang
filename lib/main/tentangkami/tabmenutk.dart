@@ -1,26 +1,19 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:dlh/animasi/animasi.dart';
 import 'package:dlh/animasi/constant.dart';
-import 'package:dlh/main/akun.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:responsive_container/responsive_container.dart';
-import 'package:vertical_tabs/vertical_tabs.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class MenuTk extends StatefulWidget {
-
   @override
   _MenuTk createState() => _MenuTk();
 }
 
-class _MenuTk extends State<MenuTk>  {
-
+class _MenuTk extends State<MenuTk> {
   int _counter = 0;
-  String nmmenu='';
-  InAppWebViewController webView;
+  String nmmenu = '';
+  late InAppWebViewController webView;
   String kons = linknya.url + 'mobile/kadis';
   int pil = 0;
   bool hil = false;
@@ -30,21 +23,21 @@ class _MenuTk extends State<MenuTk>  {
   void _incrementCounter() {
     setState(() {
       _counter++;
-
     });
   }
 
   @override
-  Future<void> stru() async{
+  Future<void> stru() async {
     webView.reload();
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _scrollController.addListener((){
-      if(_scrollController.position.pixels == _scrollController.position.maxScrollExtent)
-        _incrementCounter();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) _incrementCounter();
     });
   }
 
@@ -52,35 +45,45 @@ class _MenuTk extends State<MenuTk>  {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 5,
-        child: Scaffold(
-          appBar: AppBar(
-            title: ResponsiveContainer(widthPercent: 60,heightPercent: 4.5, child: Text('Tentang Kami', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22), textAlign: TextAlign.center,),),
-            elevation: 0,
-            backgroundColor: ColorPalette.underlineTextField,
-            bottom: TabBar(
-              isScrollable: true,
-              indicatorColor: Colors.orangeAccent,
-              tabs: <Widget>[
-                Tab(child: Text('Dasar Hukum')),
-                Tab(child: Text('Visi & Misi')),
-                Tab(child: Text('Sejarah')),
-                Tab(child: Text('Struktur Bidang')),
-                Tab(child: Text('Struktur Organisasi')),
-              ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: Container(
+            width: MediaQuery.of(context).size.width * 0.60,
+            height: MediaQuery.of(context).size.height * 0.045,
+            child: Text(
+              'Tentang Kami',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              textAlign: TextAlign.center,
             ),
           ),
-          body: _menu(),
-          backgroundColor: Colors.white,// This trailing comma makes auto-formatting nicer for build methods.
+          elevation: 0,
+          backgroundColor: ColorPalette.underlineTextField,
+          bottom: TabBar(
+            isScrollable: true,
+            indicatorColor: Colors.orangeAccent,
+            tabs: <Widget>[
+              Tab(child: Text('Dasar Hukum')),
+              Tab(child: Text('Visi & Misi')),
+              Tab(child: Text('Sejarah')),
+              Tab(child: Text('Struktur Bidang')),
+              Tab(child: Text('Struktur Organisasi')),
+            ],
+          ),
         ),
+        body: _menu(),
+        backgroundColor: Colors
+            .white, // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
-  _menu(){
+
+  _menu() {
     return TabBarView(
       physics: NeverScrollableScrollPhysics(),
       children: <Widget>[
         ListView(children: <Widget>[
-          HtmlWidget(
-            '''
+          Html(
+            data: '''
         
   <table border="0" cellpadding="0" style="width:100%; text-align:justify">
   <tbody>
@@ -101,12 +104,11 @@ class _MenuTk extends State<MenuTk>  {
     </tr>
     </tbody>
     </table>''',
-            webView: true,
           ),
         ], padding: EdgeInsets.all(10)),
         ListView(children: <Widget>[
-          HtmlWidget(
-            '''
+          Html(
+            data: '''
           <table border="0" cellpadding="0">
                 <tr>
                   <td style="font-weight:bold; font-size: xx-large; text-align:center">
@@ -132,14 +134,11 @@ class _MenuTk extends State<MenuTk>  {
                 </tr>
             </table>            
           ''',
-            webView: true,
-            unsupportedWebViewWorkaroundForIssue37: true,
           ),
-
         ], padding: EdgeInsets.all(10)),
         ListView(children: <Widget>[
-          HtmlWidget(
-            '''
+          Html(
+            data: '''
           <h2 class="hero-heading wow fadeInDown animated animated" data-wow-duration="0.6s" style="text-align:center; visibility: visible; animation-duration: 0.6s;">SEJARAH</h2>
                 <table border="0" cellpadding="10" class="hero-text wow bounceInUp animated animated" data-wow-duration="0.9s" data-wow-delay="0.2s" style="visibility: visible; animation-duration: 0.9s; animation-delay: 0.2s;">
                     
@@ -158,53 +157,60 @@ class _MenuTk extends State<MenuTk>  {
                     </tr>
                 </table>
           ''',
-            webView: true,
           )
         ], padding: EdgeInsets.all(10)),
         RefreshIndicator(
           onRefresh: stru,
           child: Column(
             children: <Widget>[
-              ResponsiveContainer(
-                widthPercent: 100,
-                heightPercent: 10,
-                child:  ListView(
+              Container(
+                width: MediaQuery.of(context).size.width * 0.100,
+                height: MediaQuery.of(context).size.height * 0.10,
+                child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: <Widget>[
-                    FlatButton(
-                      padding: EdgeInsets.only(left: 5,right: 5),
-                      onPressed: (){
+                    MaterialButton(
+                      padding: EdgeInsets.only(left: 5, right: 5),
+                      onPressed: () {
                         webView.reload();
-                        webView.loadUrl(linknya.url + 'mobile/kadis');
+                        webView.loadUrl(
+                            urlRequest: URLRequest(
+                                url: Uri.parse('${linknya.url}mobile/kadis')));
                       },
                       child: _btnmnu(nmmenu = 'Kepala Dinas'),
                     ),
-                    FlatButton(
-                      padding: EdgeInsets.only(left: 5,right: 5),
-                      onPressed: (){
+                    MaterialButton(
+                      padding: EdgeInsets.only(left: 5, right: 5),
+                      onPressed: () {
                         webView.reload();
-                        webView.loadUrl(linknya.url + 'mobile/sekdis');
+                        webView.loadUrl(
+                            urlRequest: URLRequest(
+                                url: Uri.parse('${linknya.url}mobile/sekdis')));
                       },
-                      child:_btnmnu(nmmenu = 'Sekretaris'),
+                      child: _btnmnu(nmmenu = 'Sekretaris'),
                     ),
-                    FlatButton(
-                      padding: EdgeInsets.only(left: 5,right: 5),
-                      onPressed: (){
+                    MaterialButton(
+                      padding: EdgeInsets.only(left: 5, right: 5),
+                      onPressed: () {
                         webView.reload();
-                        webView.loadUrl(linknya.url + 'mobile/unpeg');
+                        webView.loadUrl(
+                            urlRequest: URLRequest(
+                                url: Uri.parse('${linknya.url}mobile/unpeg')));
                       },
-                      child:_btnmnu(nmmenu = 'Umum dan Kepegawaian'),
+                      child: _btnmnu(nmmenu = 'Umum dan Kepegawaian'),
                     ),
 
-                    FlatButton(
-                      padding: EdgeInsets.only(left: 5,right: 5),
-                      onPressed: (){
+                    MaterialButton(
+                      padding: EdgeInsets.only(left: 5, right: 5),
+                      onPressed: () {
                         webView.reload();
-                        webView.loadUrl(linknya.url + 'mobile/pep');
+                        webView.loadUrl(
+                            urlRequest: URLRequest(
+                                url: Uri.parse('${linknya.url}mobile/pep')));
                       },
-                      child:_btnmnu(nmmenu = 'PEP dan Keuangan'),
+                      child: _btnmnu(nmmenu = 'PEP dan Keuangan'),
                     ),
-//                    FlatButton(
+//                    MaterialButton(onPressed: onPressed)(
 //                      padding: EdgeInsets.only(left: 5,right: 5),
 //                      onPressed: (){
 //                        webView.reload();
@@ -213,7 +219,7 @@ class _MenuTk extends State<MenuTk>  {
 //                      child:_btnmnu(nmmenu = 'Bidang Pengendalian'),
 //                    ),
 
-//                    FlatButton(
+//                    MaterialButton(onPressed: onPressed)(
 //                      padding: EdgeInsets.only(left: 5,right: 5),
 //                      onPressed: (){
 //                        webView.reload();
@@ -222,7 +228,7 @@ class _MenuTk extends State<MenuTk>  {
 //                      child:_btnmnu(nmmenu = 'UPTD Laboratorium'),
 //                    ),
 //
-//                    FlatButton(
+//                    MaterialButton(onPressed: onPressed)(
 //                      padding: EdgeInsets.only(left: 5,right: 5),
 //                      onPressed: (){
 //                        webView.reload();
@@ -231,42 +237,46 @@ class _MenuTk extends State<MenuTk>  {
 //                      child:_btnmnu(nmmenu = 'UPTD Perlengkapan'),
 //                    ),
 
-                    FlatButton(
-                      padding: EdgeInsets.only(left: 5,right: 5),
-                      onPressed: (){
+                    MaterialButton(
+                      padding: EdgeInsets.only(left: 5, right: 5),
+                      onPressed: () {
                         webView.reload();
-                        webView.loadUrl(linknya.url + 'mobile/jabatan');
+                        webView.loadUrl(
+                            urlRequest: URLRequest(
+                                url:
+                                    Uri.parse('${linknya.url}mobile/jabatan')));
                       },
-                      child:_btnmnu(nmmenu = 'Kelompok Jabatan Fungsional'),
+                      child: _btnmnu(nmmenu = 'Kelompok Jabatan Fungsional'),
                     ),
                   ],
                 ),
               ),
-              (progress != 1.0) ? LinearProgressIndicator(value: progress) : Padding(padding: EdgeInsets.all(0),),
-             RefreshIndicator(
-               onRefresh: stru,
-               child:  Expanded(
-                 child: ResponsiveContainer(
-                   widthPercent: 100,
-                   heightPercent: 70,
-                   padding: EdgeInsets.only(left:15, right: 15, top: 15),
-                   child:_kadis(),
-                 ),
-               ),
-             )
-
-
-
+              (progress != 1.0)
+                  ? LinearProgressIndicator(value: progress)
+                  : Padding(
+                      padding: EdgeInsets.all(0),
+                    ),
+              RefreshIndicator(
+                onRefresh: stru,
+                child: Expanded(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.100,
+                    height: MediaQuery.of(context).size.height * 0.70,
+                    padding: EdgeInsets.only(left: 15, right: 15, top: 15),
+                    child: _kadis(),
+                  ),
+                ),
+              )
             ],
           ),
         ),
         ListView(children: <Widget>[
-          HtmlWidget(
-            '''
+          Html(
+            data: '''
           <h2 class="hero-heading wow fadeInDown animated animated" data-wow-duration="0.6s" style="text-align:center; visibility: visible; animation-duration: 0.6s;">STRUKTUR ORGANISASI</h2>
           <br>
           <br>
-          <img src="https://dlh-serangkota.com/image-resources/dlh/strukdlh.png" style="margin-left:0">
+          <img src="${linknya.url}image-resources/dlh/strukdlh.png" style="margin-left:0">
           ''',
           )
         ], padding: EdgeInsets.all(10)),
@@ -274,51 +284,54 @@ class _MenuTk extends State<MenuTk>  {
     );
   }
 
-
-  Widget _kadis(){
+  Widget _kadis() {
     return InAppWebView(
-        initialUrl: kons,
-        initialHeaders: {
-
-        },
-        initialOptions: {
-
-        },
-        onWebViewCreated: (InAppWebViewController controller) {
-          webView = controller;
-        },
-        onLoadStart: (InAppWebViewController controller, String url) {
-          print("started $kons");
-          setState(() {
-            this.kons = kons;
-          });
-        },
-        onProgressChanged: (InAppWebViewController controller, int progress) {
-          setState(() {
-            this.progress = progress/100;
-          });
-        },
+      initialUrlRequest: URLRequest(url: Uri.parse(kons)),
+      onWebViewCreated: (InAppWebViewController controller) {
+        webView = controller;
+      },
+      onLoadStart: (controller, url) {
+        print("started $kons");
+        setState(() {
+          this.kons = kons;
+        });
+      },
+      onProgressChanged: (InAppWebViewController controller, int progress) {
+        setState(() {
+          this.progress = progress / 100;
+        });
+      },
     );
   }
 
-  _btnmnu(String s){
-    return ResponsiveContainer(
-      widthPercent: 40,
-      heightPercent: 15,
-      padding: EdgeInsets.only(top:10, bottom: 0),
+  _btnmnu(String s) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.40,
+      height: MediaQuery.of(context).size.height * 0.15,
+      padding: EdgeInsets.only(top: 10, bottom: 0),
       child: Container(
         padding: EdgeInsets.all(5),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: Colors.white,
           //boxShadow:[ BoxShadow(color: Colors.grey, spreadRadius: 0.5,offset: Offset(3.0,4.0), blurRadius: 5)],
-          border: Border.all(color: ColorPalette.underlineTextField, width: 1.5),
+          border:
+              Border.all(color: ColorPalette.underlineTextField, width: 1.5),
           borderRadius: BorderRadius.circular(50),
         ),
-        child:Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-          //Icon(ikon, color: ColorPalette.underlineTextField, size: 50,),
-          AutoSizeText(nmmenu,minFontSize:11,style: TextStyle(color: ColorPalette.underlineTextField, fontWeight: FontWeight.bold), textAlign: TextAlign.center,)
-        ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            //Icon(ikon, color: ColorPalette.underlineTextField, size: 50,),
+            AutoSizeText(
+              nmmenu,
+              minFontSize: 11,
+              style: TextStyle(
+                  color: ColorPalette.underlineTextField,
+                  fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            )
+          ],
         ),
       ),
     );

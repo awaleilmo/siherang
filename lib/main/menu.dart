@@ -14,12 +14,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:responsive_container/responsive_container.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ASDF extends StatelessWidget {
   final int index;
-  ASDF({this.index});
+  ASDF({required this.index});
   @override
   Widget build(BuildContext context) {
     //Navigator.pop(context, SlideLeftRoute(page: CatalogHome()));
@@ -44,7 +43,7 @@ class HomePage extends StatefulWidget{
 
 class _BottomNavPageState extends State<HomePage>{
   int _selectedTabIndex = 0;
-  Timer timer;
+  late Timer timer;
   int menu1 = 1;
   int menu2 = 0;
   int menu3 = 0;
@@ -64,9 +63,9 @@ class _BottomNavPageState extends State<HomePage>{
   int program = 0;
   int akun = 0;
   int beranda = 0;
-  int index;
+  late int index;
   int galeri = 0;
-  List fikasi = List();
+  late List fikasi;
 
   @override
   void initState(){
@@ -85,8 +84,9 @@ class _BottomNavPageState extends State<HomePage>{
   Future<Null> notf() async {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = prefs.getString('id');
-    final response = await http.get(linknya.urlbase + "app/notifuser?userId="+ userId);
+    String userId = prefs.getString('id') ?? '';
+    var url = Uri.https(linknya.url, "app/notifuser?userId="+ userId);
+    final response = await http.get(url);
     var jsson = jsonDecode(response.body);
     var data = jsson['data'];
 
@@ -120,7 +120,7 @@ class _BottomNavPageState extends State<HomePage>{
       GaleriPage(foto: foto, video: video,),
       BeritaPage(wartas: warta, pengumuman: pengumuman,),
       MyHomePage(bank: bank,),
-      AkunPage()
+      AkunPage(id: '',)
     ];
 
 
@@ -135,7 +135,7 @@ class _BottomNavPageState extends State<HomePage>{
         Stack(
           alignment: Alignment.topLeft,
           children: <Widget>[
-            FlatButton(
+            MaterialButton(
               onPressed:  (){
                 setState(() {
                   _selectedTabIndex = 0;
@@ -174,7 +174,7 @@ class _BottomNavPageState extends State<HomePage>{
         Stack(
             alignment: Alignment.topLeft,
             children: <Widget>[
-              FlatButton(
+              MaterialButton(
                 onPressed:  (){
                   setState(() {
                     _selectedTabIndex = 1;
@@ -212,7 +212,7 @@ class _BottomNavPageState extends State<HomePage>{
         Stack(
         alignment: Alignment.topLeft,
         children: <Widget>[
-        FlatButton(
+        MaterialButton(
           onPressed:  (){
             setState(() {
               _selectedTabIndex = 2;
@@ -250,7 +250,7 @@ class _BottomNavPageState extends State<HomePage>{
         Stack(
         alignment: Alignment.topLeft,
         children: <Widget>[
-        FlatButton(
+        MaterialButton(
           onPressed:  (){
             setState(() {
               _selectedTabIndex = 3;
@@ -288,7 +288,7 @@ class _BottomNavPageState extends State<HomePage>{
         Stack(
     alignment: Alignment.topLeft,
     children: <Widget>[
-        FlatButton(
+        MaterialButton(
           onPressed:  (){
             setState(() {
               _selectedTabIndex = 4;
@@ -359,7 +359,7 @@ class _BottomNavPageState extends State<HomePage>{
             title: Text("Anda akan keluar"),
             content: Text("Anda yakin untuk keluar?"),
             actions: <Widget>[
-              new FlatButton(
+              new MaterialButton(
                 child: new Text(
                     "Ya",
                     style: TextStyle(
@@ -368,7 +368,7 @@ class _BottomNavPageState extends State<HomePage>{
                 ),
                 onPressed: ()=> exit(0),
               ),
-              new FlatButton(
+              new MaterialButton(
                 child: new Text("Tidak"),
                 onPressed: () {
                   Navigator.pop(context);

@@ -1,6 +1,3 @@
-
-
-
 import 'dart:convert';
 
 import 'package:dlh/animasi/animasi.dart';
@@ -10,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-import '../main.dart';
 import 'login.dart';
 
 class RegisterPage extends StatefulWidget{
@@ -32,12 +28,13 @@ class _RegisterPage extends State<RegisterPage>{
   String mse ='';
 
   @override
-  Future<List> _register() async {
+  void _register() async {
     setState(() {
       loading = true;
     });
     if(cpass.text == pass.text) {
-      final response = await http.post(linknya.urlbase + "app/register", body: {
+      var url = Uri.https(linknya.urlbase , "app/register");
+      final response = await http.post(url, body: {
         'name': nama.text,
         'email': email.text,
         'nohp': nohp.text,

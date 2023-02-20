@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class ColorPalette{
   static const primaryColor = Color.fromRGBO(255, 255, 255, 100);
@@ -13,14 +13,14 @@ class ColorPalette{
 
 
 class linknya{
-  static const urlbase = "https://dlh-serangkota.com/api/";
-  static const url = 'https://dlh-serangkota.com/';
+  static const urlbase = "127.0.0.1:8000/api/";
+  static const url = '127.0.0.1:8000/';
 }
 
 class struktur{
   static kadis(){
     return InAppWebView(
-      initialUrl: linknya.url + 'kadis',
+      initialUrlRequest: URLRequest(url: Uri.parse('${linknya.url}kadis')),
       onWebViewCreated: (InAppWebViewController controller){},
     );
   }

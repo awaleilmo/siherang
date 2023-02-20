@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:dlh/animasi/animasi.dart';
@@ -8,11 +7,8 @@ import 'package:dlh/main/menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:responsive_container/responsive_container.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../main.dart';
 
 class LoginPage extends StatefulWidget{
   @override
@@ -30,11 +26,12 @@ class _LoginPage extends State<LoginPage>{
   String dtid='';
 
   @override
-  Future<List> _proseslogin() async{
+  void _proseslogin() async{
     setState(() {
       loading = true;
     });
-      final response = await http.post(linknya.urlbase + "app/login", body: {
+    var url = Uri.https(linknya.urlbase , "app/login");
+      final response = await http.post(url, body: {
         'email': user.text,
         'password': pass.text
       }).timeout(const Duration(seconds: 5));
@@ -86,9 +83,9 @@ class _LoginPage extends State<LoginPage>{
             _iconLogin(),
             _inputan(),
             Padding( padding: EdgeInsets.only(top: 15),),
-            ResponsiveContainer(
-              widthPercent: 50,
-              heightPercent: 5,
+            Container(
+              width: MediaQuery.of(context).size.width * 0.50,
+              height: MediaQuery.of(context).size.height * 0.05,
               alignment: Alignment.center,
               child: Text(msg, style: TextStyle(color: Colors.redAccent, fontSize: 14),),
             ),

@@ -4,9 +4,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio/dio.dart';
 import 'package:dlh/animasi/constant.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:responsive_container/responsive_container.dart';
 import 'package:http/http.dart' as http;
 
 class sipalPage extends StatefulWidget{
@@ -18,7 +17,7 @@ class _sipalPage extends State<sipalPage>{
   bool loading = false;
   bool downloading = false;
   var progressLo = "";
-  List total = List();
+  List total = [];
   String urlnya = '' ;
   ScrollController _scroll2Controller = new ScrollController();
   var progress;
@@ -32,8 +31,8 @@ class _sipalPage extends State<sipalPage>{
     });
     try {
       var dir = await getExternalStorageDirectory();
-      await dio.download('http://dlh-serangkota.com/upload/limbah/' + urlnya,
-          dir.path + "/" + urlnya, onReceiveProgress: (rec, tota) {
+      await dio.download('${linknya.url}upload/limbah/' + urlnya,
+          dir!.path + "/" + urlnya, onReceiveProgress: (rec, tota) {
             print('Rec: $rec, Total: $tota');
             setState(() {
               progress = ((rec / tota) * 100).toStringAsFixed(0) + '%';
@@ -50,7 +49,8 @@ class _sipalPage extends State<sipalPage>{
 
   @override
   Future<void> kaon() async {
-    final response = await http.get(linknya.urlbase + "app/cek/sipal" );
+    var url = Uri.https(linknya.urlbase , "app/cek/sipal");
+    final response = await http.get(url);
     var jsson = jsonDecode(response.body);
     var data = jsson['data'];
     print('sipal');
@@ -72,9 +72,9 @@ class _sipalPage extends State<sipalPage>{
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: ResponsiveContainer(
-            widthPercent: 60,
-            heightPercent: 4.5,
+          title: Container(
+            width: MediaQuery.of(context).size.width * 0.60,
+            height: MediaQuery.of(context).size.width * 0.045,
             child: Text( 'SIPAL',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22), textAlign: TextAlign.center,
             ),
@@ -88,10 +88,10 @@ class _sipalPage extends State<sipalPage>{
           ),
         ),
         body:_menu(),
-        bottomNavigationBar: awal == true ? ResponsiveContainer(
-          heightPercent: 10,
-          widthPercent: 100,
-          child: FlatButton(
+        bottomNavigationBar: awal == true ? Container(
+          height: MediaQuery.of(context).size.height * 0.10,
+          width: MediaQuery.of(context).size.width * 0.100,
+          child: MaterialButton(
             onPressed: (){},
             child: Text("Download $progress"),
           ),
@@ -114,7 +114,7 @@ class _sipalPage extends State<sipalPage>{
     return Padding(
         padding: EdgeInsets.only(top: 10),
           child: InAppWebView(
-            initialUrl: linknya.url + "mobile/sipal",
+            initialUrlRequest: URLRequest(url: Uri.parse('${linknya.url}mobile/sipal')),
            )
         ) ;
   }
@@ -127,10 +127,10 @@ class _sipalPage extends State<sipalPage>{
         if (index == total.length) {
           return _buildProgressIndicator();
         }else {
-          return ResponsiveContainer(
+          return Container(
             margin: EdgeInsets.only(bottom: 20),
-            widthPercent: 90,
-            heightPercent: 15,
+            width: MediaQuery.of(context).size.width * 0.90,
+            height: MediaQuery.of(context).size.height * 0.15,
             padding: EdgeInsets.only(left: 10, right: 10),
             child: Container(
               alignment: Alignment.topLeft,
@@ -142,9 +142,9 @@ class _sipalPage extends State<sipalPage>{
               ),
               child: Column(
                 children: <Widget>[
-                  ResponsiveContainer(
-                    widthPercent: 90,
-                    heightPercent: 6.5,
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.90,
+                    height: MediaQuery.of(context).size.width * 0.065,
                     alignment: Alignment.topLeft,
                     child: AutoSizeText(
                       total[index]['nama'],
@@ -155,11 +155,11 @@ class _sipalPage extends State<sipalPage>{
                     ),
                   ),
 
-                  ResponsiveContainer(
-                    widthPercent: 90,
-                    heightPercent: 5,
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.90,
+                    height: MediaQuery.of(context).size.height * 0.05,
                     alignment: Alignment.topLeft,
-                    child: RaisedButton(
+                    child: MaterialButton(
                       onPressed: (){
                         _downloadfile(urlnya = total[index]['forms']);
 

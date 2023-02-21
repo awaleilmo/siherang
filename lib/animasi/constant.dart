@@ -13,8 +13,8 @@ class ColorPalette{
 
 
 class linknya{
-  static const urlbase = "127.0.0.1:8000/api/";
-  static const url = '127.0.0.1:8000/';
+  static const urlbase = "http://192.168.1.6:8000/api/app";
+  static const url = 'https://dlh-kotaserang.000webhostapp.com';
 }
 
 class struktur{

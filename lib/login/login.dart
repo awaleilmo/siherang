@@ -1,70 +1,47 @@
-import 'dart:convert';
+import 'dart:async';
 
-import 'package:dlh/animasi/animasi.dart';
 import 'package:dlh/animasi/constant.dart';
-import 'package:dlh/login/register.dart';
-import 'package:dlh/main/menu.dart';
+import 'package:dlh/based/api.dart';
+import 'package:dlh/based/systems.dart';
+
+// import 'package:dlh/login/register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-class LoginPage extends StatefulWidget{
+class LoginPage extends StatefulWidget {
   @override
   _LoginPage createState() => _LoginPage();
-
 }
 
-class _LoginPage extends State<LoginPage>{
+class _LoginPage extends State<LoginPage> {
   bool passwordVisible = false;
   bool loading = false;
 
-  TextEditingController user=new TextEditingController();
-  TextEditingController pass=new TextEditingController();
-  String msg ='';
-  String dtid='';
+  TextEditingController user = new TextEditingController();
+  TextEditingController pass = new TextEditingController();
+  String msg = '';
+  String dtid = '';
 
-  @override
-  void _proseslogin() async{
+  void _proseslogin(context) async {
     setState(() {
       loading = true;
     });
-    var url = Uri.https(linknya.urlbase , "app/login");
-      final response = await http.post(url, body: {
-        'email': user.text,
-        'password': pass.text
-      }).timeout(const Duration(seconds: 5));
-      var datauser = jsonDecode(response.body);
-      var data = datauser['data'];
-      print(data);
-      if (datauser['status'] == 'gagal') {
-        Alert(
-          context: context,
-          type: AlertType.error,
-          title: "Terjadi Kesalahan",
-          desc: "Password Atau Email Salah.",
-          buttons: [
-            DialogButton(
-              child: Text(
-                "Back",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () => Navigator.pop(context),
-              width: 120,
-            )
-          ],
-        ).show();
+    new Timer(const Duration(seconds: 2), () async {
+      var response = await api().login(user.text, pass.text);
+      var data = response['data'];
+      if (response['status'] == 'gagal') {
+        systems.alertError(context, 'Email atau Password salah');
       } else {
-        print(data[0]['id'].toString());
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('id', data[0]['id'].toString());
-        prefs.setString('token', data[0]['remember_token'].toString());
-        Navigator.pushReplacement(context, SlideRightRoute(page: HomePage()));
+        await setSession(data[0]['id'].toString(),
+            data[0]['remember_token'].toString(), true);
+        // Navigator.pushReplacement(context, SlideRightRoute(page: HomePage()));
       }
       setState(() {
         loading = false;
       });
+    });
   }
 
   @override
@@ -76,136 +53,87 @@ class _LoginPage extends State<LoginPage>{
       ),
       body: DecoratedBox(
         position: DecorationPosition.background,
-        decoration: BoxDecoration(
-        ),
-        child:loading == true ? _buildProgressIndicator(): ListView(
-          children: <Widget>[
-            _iconLogin(),
-            _inputan(),
-            Padding( padding: EdgeInsets.only(top: 15),),
-            Container(
-              width: MediaQuery.of(context).size.width * 0.50,
-              height: MediaQuery.of(context).size.height * 0.05,
-              alignment: Alignment.center,
-              child: Text(msg, style: TextStyle(color: Colors.redAccent, fontSize: 14),),
-            ),
-            Stack(
-              alignment: Alignment.bottomCenter,
-              children: <Widget>[
-                _btn(context),
-              ],
-            ),
-            _text(context)
-            // _buildButton(context)
-          ],
-        ),
+        decoration: BoxDecoration(),
+        child: loading == true
+            ? systems.loadingBar()
+            : ListView(
+                children: <Widget>[
+                  _iconLogin(),
+                  _inputan(),
+                  Padding(
+                    padding: EdgeInsets.only(top: 15),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.50,
+                    height: MediaQuery.of(context).size.height * 0.05,
+                    alignment: Alignment.center,
+                    child: Text(
+                      msg,
+                      style: TextStyle(color: Colors.redAccent, fontSize: 14),
+                    ),
+                  ),
+                  Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: <Widget>[
+                      _btn(context),
+                    ],
+                  ),
+                  _text(context)
+                  // _buildButton(context)
+                ],
+              ),
       ),
-
     );
   }
 
-  _iconLogin(){
+  _iconLogin() {
     return Container(
-      child: Text(
-          'Login',
+      child: Text('Login',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: ColorPalette.underlineTextField)
-
-      ),
+          style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: ColorPalette.underlineTextField)),
       padding: EdgeInsets.all(20.0),
-
     );
   }
 
-  _inputan(){
+  _inputan() {
     return Container(
       padding: EdgeInsets.all(20.0),
       child: Column(
         children: <Widget>[
-          TextFormField(
-            controller: user,
-            decoration: new InputDecoration(
-              border: UnderlineInputBorder(),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 1.5,
-                ),
-              ),
-              prefixIcon: Icon(Icons.account_circle, color: ColorPalette.underlineTextField),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 2.5,
-                ),
-              ),
-              hintText: "Email",
-              hintStyle: TextStyle(
-                  color: ColorPalette.hintColor
-              ),
-
-            ),
-            style: TextStyle(color: Colors.black54),
-            autofocus: false,
-          ),
+          systems.inputText(user, "Email", Icons.account_circle),
           Padding(
             padding: EdgeInsets.only(top: 20.0),
           ),
-          TextFormField(
-            controller: pass ,
-            obscureText: !passwordVisible,
-            decoration: new InputDecoration(
-              border: UnderlineInputBorder(),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 1.5,
-                ),
-              ),
-              prefixIcon: Icon(Icons.lock, color: ColorPalette.underlineTextField),
-              suffixIcon: IconButton(
-                icon: Icon(passwordVisible ? Icons.visibility : Icons.visibility_off, color: ColorPalette.underlineTextField,),
-                onPressed: (){
-                  setState((){
-                    passwordVisible = !passwordVisible;
-                  });
-                },
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 2.5,
-                ),
-              ),
-              hintText: "Password",
-              hintStyle: TextStyle(
-                  color: ColorPalette.hintColor
-              ),
-
-            ),
-            style: TextStyle(color: Colors.black54),
-            autofocus: false,
-          ),
+          systems.inputPassword(pass, 'Passwords', passwordVisible, (){
+            setState(() {
+              passwordVisible = !passwordVisible;
+            });
+          }),
         ],
       ),
     );
   }
 
-  _btn(BuildContext context){
+  _btn(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(top:150, right: 20, left: 20),
-      child:
-      InkWell(
-
-        onTap:  (){
-         _proseslogin();
+      padding: EdgeInsets.only(top: 150, right: 20, left: 20),
+      child: InkWell(
+        onTap: () {
+          var sams = Overlay.of(context);
+          _proseslogin(sams);
         },
         child: Container(
-          padding: EdgeInsets.symmetric(vertical:15.0),
+          padding: EdgeInsets.symmetric(vertical: 15.0),
           width: 255,
           child: Text(
             "Login",
-            style: TextStyle(color: Colors.white, fontSize: 18,),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
             textAlign: TextAlign.center,
           ),
           decoration: BoxDecoration(
@@ -213,12 +141,11 @@ class _LoginPage extends State<LoginPage>{
             borderRadius: BorderRadius.circular(30.0),
           ),
         ),
-
       ),
     );
   }
 
-  _text(BuildContext context){
+  _text(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
       child: Row(
@@ -229,17 +156,27 @@ class _LoginPage extends State<LoginPage>{
             textAlign: TextAlign.right,
             style: TextStyle(fontSize: 11),
           ),
-          Padding(padding: EdgeInsets.only(left: 0),),
+          Padding(
+            padding: EdgeInsets.only(left: 0),
+          ),
           InkWell(
-            onTap: (){
-              Navigator.pushReplacement(context, SlideLeftRoute(page: RegisterPage()));
+            onTap: () {
+              setState(() {
+                loading = true;
+              });
+              new Timer(const Duration(seconds: 2), () {
+                Navigator.pushReplacementNamed(context, '/register');
+                setState(() {
+                  loading = false;
+                });
+              });
             },
             child: Container(
               padding: EdgeInsets.only(left: 5, top: 20, bottom: 20),
               child: Text(
                 "Register",
-                style: TextStyle(color: ColorPalette.underlineTextField, fontSize: 11),
-
+                style: TextStyle(
+                    color: ColorPalette.underlineTextField, fontSize: 11),
               ),
             ),
           )
@@ -247,17 +184,4 @@ class _LoginPage extends State<LoginPage>{
       ),
     );
   }
-
-  _buildProgressIndicator() {
-    return new Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: new Center(
-        child: new Opacity(
-          opacity: loading ? 1.0 : 00,
-          child: new CircularProgressIndicator(),
-        ),
-      ),
-    );
-  }
-
 }

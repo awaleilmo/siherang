@@ -5,11 +5,13 @@ import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:dlh/animasi/constant.dart';
-import 'package:dlh/main/akun.dart';
-import 'package:dlh/main/berita.dart';
-import 'package:dlh/main/contoh.dart';
-import 'package:dlh/main/galeri/galeri.dart';
-import 'package:dlh/main/home.dart';
+import 'package:dlh/based/api.dart';
+import 'package:dlh/based/systems.dart';
+// import 'package:dlh/main/akun.dart';
+// import 'package:dlh/main/berita.dart';
+// import 'package:dlh/main/contoh.dart';
+// import 'package:dlh/main/galeri/galeri.dart';
+// import 'package:dlh/main/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,7 +29,10 @@ class ASDF extends StatelessWidget {
       child: Center(
           child: !(index == 0) ? Text("sip ${index}")
               :     InkWell(
-              child: Text('logout'),
+              child: TextButton(onPressed: () {
+                setSession('', '', false);
+                Navigator.pushReplacementNamed(context, '/');
+              }, child: Text('logout'),),
               onTap: () {
 
               }
@@ -70,8 +75,8 @@ class _BottomNavPageState extends State<HomePage>{
   @override
   void initState(){
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) => notf());
-
+    // timer = Timer.periodic(Duration(seconds: 1), (Timer t) => notf());
+    notf();
   }
 
   void _onNavBarTapped(index){
@@ -80,34 +85,36 @@ class _BottomNavPageState extends State<HomePage>{
     });
   }
 
-  @override
   Future<Null> notf() async {
+    final response = await api().notifUser();
+    var data = response['data'];
+    print(data);
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = prefs.getString('id') ?? '';
-    var url = Uri.https(linknya.url, "app/notifuser?userId="+ userId);
-    final response = await http.get(url);
-    var jsson = jsonDecode(response.body);
-    var data = jsson['data'];
+    // setState(() {
+    //   fikasi = data;
+    //   sppl = int.parse(fikasi[0]['sppl']);
+    //   amdal = int.parse(fikasi[0]['amdal']);
+    //   uklupl = int.parse(fikasi[0]['uklupl']);
+    //   pengaduan = int.parse(fikasi[0]['pengaduan']);
+    //   datas = int.parse(fikasi[0]['data']);
+    //   beranda = sppl + amdal + uklupl + pengaduan + datas;
+    //   warta = int.parse(fikasi[0]['warta']);
+    //   pengumuman = int.parse(fikasi[0]['pengumuman']);
+    //   berita = warta + pengumuman;
+    //   bank = int.parse(fikasi[0]['banksampah']);
+    //   program = bank;
+    //   foto = int.parse(fikasi[0]['foto']);
+    //   video = int.parse(fikasi[0]['video']);
+    //   galeri = foto + video;
+    //
+    // });
+  }
 
-    setState(() {
-      fikasi = data;
-      sppl = int.parse(fikasi[0]['sppl']);
-      amdal = int.parse(fikasi[0]['amdal']);
-      uklupl = int.parse(fikasi[0]['uklupl']);
-      pengaduan = int.parse(fikasi[0]['pengaduan']);
-      datas = int.parse(fikasi[0]['data']);
-      beranda = sppl + amdal + uklupl + pengaduan + datas;
-      warta = int.parse(fikasi[0]['warta']);
-      pengumuman = int.parse(fikasi[0]['pengumuman']);
-      berita = warta + pengumuman;
-      bank = int.parse(fikasi[0]['banksampah']);
-      program = bank;
-      foto = int.parse(fikasi[0]['foto']);
-      video = int.parse(fikasi[0]['video']);
-      galeri = foto + video;
-
-    });
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    timer.cancel();
   }
 
 
@@ -116,11 +123,16 @@ class _BottomNavPageState extends State<HomePage>{
   Widget build(BuildContext context){
 
     final _listPage = <Widget>[
-      Beranda(amnot : amdal, spnot : sppl, uknot : uklupl, pengnot : pengaduan, datas : datas),
-      GaleriPage(foto: foto, video: video,),
-      BeritaPage(wartas: warta, pengumuman: pengumuman,),
-      MyHomePage(bank: bank,),
-      AkunPage(id: '',)
+      // Beranda(amnot : amdal, spnot : sppl, uknot : uklupl, pengnot : pengaduan, datas : datas),
+      // GaleriPage(foto: foto, video: video,),
+      // BeritaPage(wartas: warta, pengumuman: pengumuman,),
+      // MyHomePage(bank: bank,),
+      // AkunPage(id: '',)
+      ASDF(index: 1),
+      ASDF(index: 2),
+      ASDF(index: 3),
+      ASDF(index: 4),
+      ASDF(index: 0),
     ];
 
 

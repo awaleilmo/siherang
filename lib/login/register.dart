@@ -1,106 +1,119 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dlh/animasi/animasi.dart';
 import 'package:dlh/animasi/constant.dart';
+import 'package:dlh/based/api.dart';
+import 'package:dlh/based/systems.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'login.dart';
 
-class RegisterPage extends StatefulWidget{
+class RegisterPage extends StatefulWidget {
   @override
   _RegisterPage createState() => _RegisterPage();
 }
 
-class _RegisterPage extends State<RegisterPage>{
-
+class _RegisterPage extends State<RegisterPage> {
   bool pw1 = false;
   bool pw2 = false;
-  String msg='';
+  String msg = '';
   bool loading = false;
-  TextEditingController email=new TextEditingController();
-  TextEditingController nama=new TextEditingController();
-  TextEditingController nohp=new TextEditingController();
-  TextEditingController pass=new TextEditingController();
-  TextEditingController cpass=new TextEditingController();
-  String mse ='';
+  TextEditingController email = new TextEditingController();
+  TextEditingController nama = new TextEditingController();
+  TextEditingController nohp = new TextEditingController();
+  TextEditingController pass = new TextEditingController();
+  TextEditingController cpass = new TextEditingController();
+  String mse = '';
 
-  @override
-  void _register() async {
+  void _loading() {
+    setState(() {
+      loading = !loading;
+    });
+  }
+
+  void _register(context) async {
     setState(() {
       loading = true;
     });
-    if(cpass.text == pass.text) {
-      var url = Uri.https(linknya.urlbase , "app/register");
-      final response = await http.post(url, body: {
-        'name': nama.text,
-        'email': email.text,
-        'nohp': nohp.text,
-        'password': pass.text,
-        'c_password': pass.text,
-      });
-      var jsson = jsonDecode(response.body);
-      var data = jsson['data'];
-      var status = jsson['status'];
-      var errors = jsson['error'];
-      if (errors != null) {
-        print(errors);
-        Alert(
-          context: context,
-          type: AlertType.error,
-          title: "Terjadi Kesalahan",
-          desc: 'Email Tidak Valid / Email Sudah Terdaftar',
-          buttons: [
-            DialogButton(
-              child: Text(
-                "Back",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () => Navigator.pop(context),
-              width: 120,
-            )
-          ],
-        ).show();
-      }else if(status == 'sukses'){
-        Alert(
-          context: context,
-          type: AlertType.success,
-          title: "Berhasil",
-          desc: 'Email dan Password Anda berhasil didaftarkan',
-          buttons: [
-            DialogButton(
-              child: Text(
-                "Next",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () => Navigator.pushReplacement(context, SlideRightRoute(page: LoginPage())),
-              width: 120,
-            )
-          ],
-        ).show();
+    new Timer(const Duration(seconds: 2), () async {
+      if (nama.text == '') {
+        _loading();
+        systems.alertError(context, 'Nama Harus diisi');
+        return;
       }
-    }else{
-      Alert(
-        context: context,
-        type: AlertType.error,
-        title: "Terjadi Kesalahan",
-        desc: 'Password Tidak Sama',
-        buttons: [
-          DialogButton(
-            child: Text(
-              "Back",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            onPressed: () => Navigator.pop(context),
-            width: 120,
-          )
-        ],
-      ).show();
-    }
-    setState(() {
-      loading = false;
+      if (email.text == '') {
+        _loading();
+        systems.alertError(context, 'Email Harus diisi');
+        return;
+      }
+      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email.text)) {
+        _loading();
+        systems.alertError(context, 'Alamat Email Tidak Benar');
+        return;
+      }
+      if (nohp.text == '') {
+        _loading();
+        systems.alertError(context, 'No HP Harus diisi');
+        return;
+      }
+      if (nohp.text.length < 11) {
+        _loading();
+        systems.alertError(context, 'No HP Tidak Benar');
+        return;
+      }
+      if (pass.text.length < 6) {
+        _loading();
+        systems.alertError(context, 'Password minimal 6 karakter');
+        return;
+      }
+      if (pass.text == '') {
+        _loading();
+        systems.alertError(context, 'Password Harus diisi');
+        return;
+      }
+      if (cpass.text == '') {
+        _loading();
+        systems.alertError(context, 'Konfirm Password Harus diisi');
+        return;
+      }
+      if (cpass.text != pass.text) {
+        _loading();
+        systems.alertError(context, 'Password Tidak Sama');
+        return;
+      }
+      final response =
+          await api().register(nama.text, email.text, nohp.text, pass.text);
+      if (response['error'] != null) {
+        var emailError = response['error']['email'] ?? null;
+        var noHpError = response['error']['nohp'] ?? null;
+        if(noHpError != null) {
+          systems.alertError(
+              context, noHpError[0]);
+        }
+        if(emailError != null) {
+          systems.alertError(
+              context, emailError[0]);
+        }
+
+      } else if (response['status'] == 'sukses') {
+        setState(() {
+          email.text = '';
+          nama.text = '';
+          nohp.text = '';
+          pass.text = '';
+          cpass.text = '';
+        });
+        systems.alertSuccess(context, 'Berhasil di Daftarkan, silahkan login');
+      } else {
+        systems.alertError(
+            context, 'Terjadi Kesalahan, Coba ulangi lagi');
+      }
+      setState(() {
+        loading = false;
+      });
     });
   }
 
@@ -113,215 +126,85 @@ class _RegisterPage extends State<RegisterPage>{
       ),
       body: DecoratedBox(
         position: DecorationPosition.background,
-        decoration: BoxDecoration(
-        ),
-        child:loading == true? _buildProgressIndicator():ListView(
-          children: <Widget>[
-            _iconLogin(),
-            _inputan(),
-            _btn(context),
-            _text(context)
-            // _buildButton(context)
-          ],
-        ),
+        decoration: BoxDecoration(),
+        child: loading == true
+            ? systems.loadingBar()
+            : ListView(
+                children: <Widget>[
+                  _iconLogin(),
+                  _inputan(),
+                  _btn(context),
+                  _text(context)
+                  // _buildButton(context)
+                ],
+              ),
       ),
-
     );
   }
 
- _iconLogin(){
+  _iconLogin() {
     return Container(
-      child: Text(
-          'Register',
+      child: Text('Register',
           textAlign: TextAlign.left,
-          style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: ColorPalette.underlineTextField)
-
-      ),
+          style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: ColorPalette.underlineTextField)),
       padding: EdgeInsets.all(20.0),
-
     );
   }
 
- _inputan(){
+  _inputan() {
     return Container(
       padding: EdgeInsets.all(20.0),
       child: Column(
         children: <Widget>[
-          TextFormField(
-            controller: nama,
-            decoration: new InputDecoration(
-              border: UnderlineInputBorder(),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 1.5,
-                ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 2.5,
-                ),
-              ),
-              hintText: "Nama Lengkap",
-              hintStyle: TextStyle(
-                  color: ColorPalette.hintColor
-              ),
-
-            ),
-            style: TextStyle(color: Colors.black54),
-            autofocus: false,
-          ),
+          systems.inputText(nama, 'Nama Lengkap', Icons.account_box_rounded),
           Padding(
             padding: EdgeInsets.only(top: 20.0),
           ),
-          TextFormField(
-            controller: email,
-            decoration: new InputDecoration(
-              border: UnderlineInputBorder(),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 1.5,
-                ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 2.5,
-                ),
-              ),
-              hintText: "Email",
-              hintStyle: TextStyle(
-                  color: ColorPalette.hintColor
-              ),
-
-            ),
-            style: TextStyle(color: Colors.black54),
-            autofocus: false,
-          ),
+          systems.inputText(email, 'Email', Icons.email),
           Padding(
             padding: EdgeInsets.only(top: 20.0),
           ),
-          TextFormField(
-            controller: nohp,
-            decoration: new InputDecoration(
-              border: UnderlineInputBorder(),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 1.5,
-                ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 2.5,
-                ),
-              ),
-              hintText: "No HP",
-              hintStyle: TextStyle(
-                  color: ColorPalette.hintColor
-              ),
-
-            ),
-            style: TextStyle(color: Colors.black54),
-            autofocus: false,
-          ),
+          systems.inputNumber(email, 'No HP', Icons.phone),
           Padding(
             padding: EdgeInsets.only(top: 20.0),
           ),
-          TextFormField(
-            controller: pass,
-            decoration: new InputDecoration(
-              border: UnderlineInputBorder(),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 1.5,
-                ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 2.5,
-                ),
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(pw1 ? Icons.visibility : Icons.visibility_off, color: ColorPalette.underlineTextField,),
-                onPressed: (){
-                  setState((){
-                    pw1 = !pw1;
-                  });
-                },
-              ),
-              hintText: "Password",
-              hintStyle: TextStyle(
-                  color: ColorPalette.hintColor
-              ),
-
-            ),
-            style: TextStyle(color: Colors.black54),
-            autofocus: false,
-            obscureText: !pw1,
-          ),
+          systems.inputPassword(pass, "Password", pw1, () {
+            setState(() {
+              pw1 = !pw1;
+            });
+          }),
           Padding(
             padding: EdgeInsets.only(top: 20.0),
           ),
-          TextFormField(
-            controller: cpass,
-            decoration: new InputDecoration(
-              border: UnderlineInputBorder(),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 1.5,
-                ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: ColorPalette.underlineTextField,
-                  width: 2.5,
-                ),
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(pw2 ? Icons.visibility : Icons.visibility_off, color: ColorPalette.underlineTextField,),
-                onPressed: (){
-                  setState((){
-                    pw2 = !pw2;
-                  });
-                },
-              ),
-              hintText: "Ulangi Password",
-              hintStyle: TextStyle(
-                  color: ColorPalette.hintColor
-              ),
-
-            ),
-            style: TextStyle(color: Colors.black54),
-            autofocus: false,
-            obscureText: !pw2,
-          ),
+          systems.inputPassword(cpass, "Konfirmasi Password", pw2, () {
+            setState(() {
+              pw2 = !pw2;
+            });
+          }),
         ],
       ),
     );
   }
 
- _btn(BuildContext context){
+  _btn(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(top:50, right: 20, left: 20),
-      child:
-      InkWell(
-
-        onTap:  (){
-          _register();
+      padding: EdgeInsets.only(top: 50, right: 20, left: 20),
+      child: InkWell(
+        onTap: () {
+          _register(Overlay.of(context));
         },
         child: Container(
-          padding: EdgeInsets.symmetric(vertical:15.0),
+          padding: EdgeInsets.symmetric(vertical: 15.0),
           width: 200,
           child: Text(
             "Register",
-            style: TextStyle(color: Colors.white, fontSize: 18,),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
             textAlign: TextAlign.center,
           ),
           decoration: BoxDecoration(
@@ -329,12 +212,11 @@ class _RegisterPage extends State<RegisterPage>{
             borderRadius: BorderRadius.circular(30.0),
           ),
         ),
-
       ),
     );
   }
 
- _text(BuildContext context){
+  _text(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
       child: Row(
@@ -345,18 +227,28 @@ class _RegisterPage extends State<RegisterPage>{
             textAlign: TextAlign.right,
             style: TextStyle(fontSize: 11),
           ),
-          Padding(padding: EdgeInsets.only(left: 0),),
+          Padding(
+            padding: EdgeInsets.only(left: 0),
+          ),
           InkWell(
-            onTap: (){
-              Navigator.pushReplacement(context, SlideLeftRoute(page: LoginPage()));
+            onTap: () {
+              setState(() {
+                loading = true;
+              });
+              new Timer(const Duration(seconds: 2), () {
+                Navigator.pushReplacementNamed(context, '/login');
+                setState(() {
+                  loading = false;
+                });
+              });
             },
             child: Container(
               padding: EdgeInsets.only(left: 5.0, top: 20, bottom: 20),
               child: Text(
                 "Login",
                 textAlign: TextAlign.left,
-                style: TextStyle(color: ColorPalette.underlineTextField, fontSize: 11),
-
+                style: TextStyle(
+                    color: ColorPalette.underlineTextField, fontSize: 11),
               ),
             ),
           )
@@ -365,15 +257,4 @@ class _RegisterPage extends State<RegisterPage>{
     );
   }
 
- _buildProgressIndicator() {
-    return new Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: new Center(
-        child: new Opacity(
-          opacity: loading ? 1.0 : 00,
-          child: new CircularProgressIndicator(),
-        ),
-      ),
-    );
-  }
 }

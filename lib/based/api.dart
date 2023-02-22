@@ -43,15 +43,34 @@ class api {
     return dataJson;
   }
 
-  Future<dynamic> notifUser() async{
+  Future<dynamic> notifUser() async {
     late dynamic dataJson;
     try {
       var res = await getSession();
       var userId = res['userId'];
-      final response = await Dio().get("${linknya.urlbase}/notifuser?userId="+ userId,
-          options: Options(headers: {
-            "Content-Type": "application/json",
-          }));
+      final response =
+          await Dio().get("${linknya.urlbase}/notifuser?userId=" + userId,
+              options: Options(headers: {
+                "Content-Type": "application/json",
+              }));
+      dataJson = response.data;
+    } on DioError catch (e) {
+      print(e);
+      dataJson = e.response?.data;
+    }
+    return dataJson;
+  }
+
+  Future<dynamic> findUser() async {
+    late dynamic dataJson;
+    try {
+      var res = await getSession();
+      var userId = res['userId'];
+      final response =
+          await Dio().get("${linknya.urlbase}/finduser?id=" + userId,
+              options: Options(headers: {
+                "Content-Type": "application/json",
+              }));
       dataJson = response.data;
     } on DioError catch (e) {
       print(e);

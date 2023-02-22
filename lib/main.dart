@@ -184,7 +184,7 @@ class _Utama extends State<Utama> {
             setState(() {
               loading = true;
             });
-            new Timer(const Duration(seconds: 2), () {
+            new Timer(const Duration(seconds: 1), () {
               Navigator.pushNamed(context, '/login');
               setState(() {
                 loading = false;
@@ -216,7 +216,7 @@ class _Utama extends State<Utama> {
             setState(() {
               loading = true;
             });
-            new Timer(const Duration(seconds: 2), () {
+            new Timer(const Duration(seconds: 1), () {
               Navigator.pushNamed(context, '/register');
               setState(() {
                 loading = false;

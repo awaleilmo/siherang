@@ -4,9 +4,9 @@ import 'package:dlh/animasi/constant.dart';
 import 'package:dlh/based/api.dart';
 import 'package:dlh/based/systems.dart';
 
-// import 'package:dlh/login/register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -24,7 +24,7 @@ class _LoginPage extends State<LoginPage> {
   String msg = '';
   String dtid = '';
 
-  void _proseslogin(context) async {
+  void _proseslogin(context, konteks) async {
     setState(() {
       loading = true;
     });
@@ -36,7 +36,8 @@ class _LoginPage extends State<LoginPage> {
       } else {
         await setSession(data[0]['id'].toString(),
             data[0]['remember_token'].toString(), true);
-        // Navigator.pushReplacement(context, SlideRightRoute(page: HomePage()));
+        await setDataUser(data[0]);
+        Navigator.pushReplacementNamed(konteks, '/home');
       }
       setState(() {
         loading = false;
@@ -47,54 +48,71 @@ class _LoginPage extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: ColorPalette.underlineTextField),
-        backgroundColor: Colors.white,
-      ),
-      body: DecoratedBox(
-        position: DecorationPosition.background,
-        decoration: BoxDecoration(),
-        child: loading == true
-            ? systems.loadingBar()
-            : ListView(
-                children: <Widget>[
-                  _iconLogin(),
-                  _inputan(),
-                  Padding(
-                    padding: EdgeInsets.only(top: 15),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.50,
-                    height: MediaQuery.of(context).size.height * 0.05,
-                    alignment: Alignment.center,
-                    child: Text(
-                      msg,
-                      style: TextStyle(color: Colors.redAccent, fontSize: 14),
-                    ),
-                  ),
-                  Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: <Widget>[
-                      _btn(context),
+      backgroundColor: ColorPalette.underlineTextField,
+      body: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                automaticallyImplyLeading: false,
+                leadingWidth: 0,
+                backgroundColor: ColorPalette.underlineTextField,
+                expandedHeight: 100.0,
+                floating: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  centerTitle: true,
+                  title: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back_ios_new,
+                          size: 18,
+                          weight: 15.0,
+                        ),
+                        color: Colors.white,
+                      ),
+                      Text("Sign In",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26.0,
+                              fontFamily: 'BluesSmile'))
                     ],
                   ),
-                  _text(context)
-                  // _buildButton(context)
-                ],
+                ),
               ),
-      ),
+            ];
+          },
+          body: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30))),
+            child: loading == true
+                ? systems.loadingBar()
+                : ListView(
+                    children: <Widget>[
+                      _iconLogin(context),
+                      _inputan(),
+                      _btn(context),
+                      _text(context)
+                    ],
+                  ),
+          )),
     );
   }
 
-  _iconLogin() {
+  _iconLogin(BuildContext context) {
     return Container(
-      child: Text('Login',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: ColorPalette.underlineTextField)),
-      padding: EdgeInsets.all(20.0),
+      height: MediaQuery.of(context).size.height * 0.25,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        width: double.infinity,
+        child: SvgPicture.asset('asset/img/add_information.svg',
+            semanticsLabel: 'Acme Logo'),
+      ),
     );
   }
 
@@ -107,7 +125,7 @@ class _LoginPage extends State<LoginPage> {
           Padding(
             padding: EdgeInsets.only(top: 20.0),
           ),
-          systems.inputPassword(pass, 'Passwords', passwordVisible, (){
+          systems.inputPassword(pass, 'Passwords', passwordVisible, () {
             setState(() {
               passwordVisible = !passwordVisible;
             });
@@ -119,26 +137,22 @@ class _LoginPage extends State<LoginPage> {
 
   _btn(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(top: 150, right: 20, left: 20),
+      padding: EdgeInsets.only(top: 50, right: 20, left: 20),
       child: InkWell(
         onTap: () {
-          var sams = Overlay.of(context);
-          _proseslogin(sams);
+          _proseslogin(Overlay.of(context), context);
         },
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 15.0),
-          width: 255,
           child: Text(
-            "Login",
+            "Sign In",
             style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-            ),
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           decoration: BoxDecoration(
             color: ColorPalette.underlineTextField,
-            borderRadius: BorderRadius.circular(30.0),
+            borderRadius: BorderRadius.circular(15.0),
           ),
         ),
       ),
@@ -164,7 +178,7 @@ class _LoginPage extends State<LoginPage> {
               setState(() {
                 loading = true;
               });
-              new Timer(const Duration(seconds: 2), () {
+              new Timer(const Duration(seconds: 1), () {
                 Navigator.pushReplacementNamed(context, '/register');
                 setState(() {
                   loading = false;
@@ -174,7 +188,7 @@ class _LoginPage extends State<LoginPage> {
             child: Container(
               padding: EdgeInsets.only(left: 5, top: 20, bottom: 20),
               child: Text(
-                "Register",
+                "Sign Up",
                 style: TextStyle(
                     color: ColorPalette.underlineTextField, fontSize: 11),
               ),

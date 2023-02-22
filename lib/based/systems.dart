@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:dlh/animasi/constant.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,90 +11,148 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class systems {
-  static inputText(control, String name, icons) => TextFormField(
-        controller: control,
-        decoration: new InputDecoration(
-          border: UnderlineInputBorder(),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: ColorPalette.underlineTextField,
-              width: 1.5,
+  static inputText(control, String name, icons) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+              height: 25,
+              child: Padding(
+                padding: EdgeInsets.only(left: 5),
+                child: Text(
+                  name,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              )),
+          TextFormField(
+            controller: control,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: ColorPalette.textFiled,
+              contentPadding: const EdgeInsets.symmetric(vertical: 15),
+              border: OutlineInputBorder(),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(
+                  color: ColorPalette.textFiledBorder,
+                  style: BorderStyle.solid,
+                  width: 0.2,
+                ),
+              ),
+              prefixIcon: Icon(icons ?? Icons.text_fields,
+                  color: ColorPalette.textFiledBorder),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(
+                  style: BorderStyle.none,
+                ),
+              ),
+              hintText: name,
+              hintStyle: TextStyle(
+                  color: ColorPalette.hintColor, fontWeight: FontWeight.w500),
             ),
-          ),
-          prefixIcon: Icon(icons ?? Icons.text_fields,
-              color: ColorPalette.underlineTextField),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: ColorPalette.underlineTextField,
-              width: 2.5,
+            style: TextStyle(color: Colors.black54),
+            autofocus: false,
+          )
+        ],
+      );
+  static inputNumber(control, String name, icons) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+              height: 25,
+              child: Padding(
+                padding: EdgeInsets.only(left: 5),
+                child: Text(
+                  name,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              )),
+          TextFormField(
+            controller: control,
+            keyboardType: TextInputType.number,
+            decoration: new InputDecoration(
+              filled: true,
+              fillColor: ColorPalette.textFiled,
+              contentPadding: const EdgeInsets.symmetric(vertical: 15),
+              border: OutlineInputBorder(),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(
+                  color: ColorPalette.textFiledBorder,
+                  style: BorderStyle.solid,
+                  width: 0.2,
+                ),
+              ),
+              prefixIcon: Icon(icons ?? Icons.text_fields,
+                  color: ColorPalette.textFiledBorder),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(
+                  style: BorderStyle.none,
+                ),
+              ),
+              hintText: name,
+              hintStyle: TextStyle(
+                  color: ColorPalette.hintColor, fontWeight: FontWeight.w500),
             ),
-          ),
-          hintText: name,
-          hintStyle: TextStyle(color: ColorPalette.hintColor),
-        ),
-        style: TextStyle(color: Colors.black54),
-        autofocus: false,
+            style: TextStyle(color: Colors.black54),
+            autofocus: false,
+          )
+        ],
       );
 
-  static inputNumber(control, String name, icons) => TextFormField(
-        controller: control,
-        keyboardType: TextInputType.number,
-        decoration: new InputDecoration(
-          border: UnderlineInputBorder(),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: ColorPalette.underlineTextField,
-              width: 1.5,
+  static inputPassword(control, String name, bool passwordVisible, onTaps) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+              height: 25,
+              child: Padding(
+                padding: EdgeInsets.only(left: 5),
+                child: Text(
+                  name,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              )),
+          TextFormField(
+            controller: control,
+            obscureText: !passwordVisible,
+            decoration: new InputDecoration(
+              filled: true,
+              fillColor: ColorPalette.textFiled,
+              contentPadding: const EdgeInsets.symmetric(vertical: 15),
+              border: OutlineInputBorder(),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(
+                  color: ColorPalette.textFiledBorder,
+                  style: BorderStyle.solid,
+                  width: 0.2,
+                ),
+              ),
+              prefixIcon: Icon(Icons.lock, color: ColorPalette.textFiledBorder),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  passwordVisible ? Icons.visibility : Icons.visibility_off,
+                  color: ColorPalette.textFiledBorder,
+                ),
+                onPressed: onTaps,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide(
+                  style: BorderStyle.none,
+                ),
+              ),
+              hintText: name,
+              hintStyle: TextStyle(
+                  color: ColorPalette.hintColor, fontWeight: FontWeight.w500),
             ),
-          ),
-          prefixIcon: Icon(icons ?? Icons.text_fields,
-              color: ColorPalette.underlineTextField),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: ColorPalette.underlineTextField,
-              width: 2.5,
-            ),
-          ),
-          hintText: name,
-          hintStyle: TextStyle(color: ColorPalette.hintColor),
-        ),
-        style: TextStyle(color: Colors.black54),
-        autofocus: false,
+            style: TextStyle(color: Colors.black54),
+            autofocus: false,
+          )
+        ],
       );
-
-  static inputPassword(control, String name, bool passwordVisible, onTaps) => TextFormField(
-    controller: control,
-    obscureText: !passwordVisible,
-    decoration: new InputDecoration(
-      border: UnderlineInputBorder(),
-      enabledBorder: UnderlineInputBorder(
-        borderSide: BorderSide(
-          color: ColorPalette.underlineTextField,
-          width: 1.5,
-        ),
-      ),
-      prefixIcon:
-      Icon(Icons.lock, color: ColorPalette.underlineTextField),
-      suffixIcon: IconButton(
-        icon: Icon(
-          passwordVisible ? Icons.visibility : Icons.visibility_off,
-          color: ColorPalette.underlineTextField,
-        ),
-        onPressed: onTaps,
-      ),
-      focusedBorder: UnderlineInputBorder(
-        borderSide: BorderSide(
-          color: ColorPalette.underlineTextField,
-          width: 2.5,
-        ),
-      ),
-      hintText: name,
-      hintStyle: TextStyle(color: ColorPalette.hintColor),
-    ),
-    style: TextStyle(color: Colors.black54),
-    autofocus: false,
-  );
-
   static alertError(context, pesan) => showTopSnackBar(
         context,
         CustomSnackBar.error(
@@ -115,11 +175,37 @@ class systems {
       );
 
   static loadingBar() => Center(
-        child: LoadingAnimationWidget.inkDrop(
+        child: LoadingAnimationWidget.discreteCircle(
           color: Colors.green,
           size: 50,
         ),
       );
+
+  static String capitalize(String value) {
+    var result = value[0].toUpperCase();
+    bool cap = true;
+    for (int i = 1; i < value.length; i++) {
+      if (value[i - 1] == " " && cap == true) {
+        result = result + value[i].toUpperCase();
+      } else {
+        result = result + value[i];
+        cap = false;
+      }
+    }
+    return result;
+  }
+
+  static String capitalizeAllWord(String value) {
+    var result = value[0].toUpperCase();
+    for (int i = 1; i < value.length; i++) {
+      if (value[i - 1] == " ") {
+        result = result + value[i].toUpperCase();
+      } else {
+        result = result + value[i];
+      }
+    }
+    return result;
+  }
 }
 
 Future<bool> checkConnection() async {
@@ -142,5 +228,19 @@ Future<dynamic> setSession(userId, token, login) async {
   prefs.setBool('login', login);
   prefs.setString('token', token);
   dynamic result = {'userId': userId, 'token': token, 'login': login};
+  return result;
+}
+
+Future<dynamic> setDataUser(data) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString('dataUser', jsonEncode(data).toString());
+  dynamic result = {'data': data};
+  return result;
+}
+
+Future<dynamic> getDataUser() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var data = prefs.getString('dataUser') ?? '';
+  dynamic result = jsonDecode(data);
   return result;
 }

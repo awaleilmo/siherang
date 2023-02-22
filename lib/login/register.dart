@@ -7,6 +7,7 @@ import 'package:dlh/based/api.dart';
 import 'package:dlh/based/systems.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 
 import 'login.dart';
@@ -89,15 +90,12 @@ class _RegisterPage extends State<RegisterPage> {
       if (response['error'] != null) {
         var emailError = response['error']['email'] ?? null;
         var noHpError = response['error']['nohp'] ?? null;
-        if(noHpError != null) {
-          systems.alertError(
-              context, noHpError[0]);
+        if (noHpError != null) {
+          systems.alertError(context, noHpError[0]);
         }
-        if(emailError != null) {
-          systems.alertError(
-              context, emailError[0]);
+        if (emailError != null) {
+          systems.alertError(context, emailError[0]);
         }
-
       } else if (response['status'] == 'sukses') {
         setState(() {
           email.text = '';
@@ -108,8 +106,7 @@ class _RegisterPage extends State<RegisterPage> {
         });
         systems.alertSuccess(context, 'Berhasil di Daftarkan, silahkan login');
       } else {
-        systems.alertError(
-            context, 'Terjadi Kesalahan, Coba ulangi lagi');
+        systems.alertError(context, 'Terjadi Kesalahan, Coba ulangi lagi');
       }
       setState(() {
         loading = false;
@@ -120,37 +117,71 @@ class _RegisterPage extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: ColorPalette.underlineTextField),
-        backgroundColor: Colors.white,
-      ),
-      body: DecoratedBox(
-        position: DecorationPosition.background,
-        decoration: BoxDecoration(),
-        child: loading == true
-            ? systems.loadingBar()
-            : ListView(
-                children: <Widget>[
-                  _iconLogin(),
-                  _inputan(),
-                  _btn(context),
-                  _text(context)
-                  // _buildButton(context)
-                ],
+      backgroundColor: ColorPalette.underlineTextField,
+      body: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                automaticallyImplyLeading: false,
+                leadingWidth: 0,
+                backgroundColor: ColorPalette.underlineTextField,
+                expandedHeight: 100.0,
+                floating: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  centerTitle: true,
+                  title: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back_ios_new,
+                          size: 18,
+                          weight: 15.0,
+                        ),
+                        color: Colors.white,
+                      ),
+                      Text("Sign Up",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26.0,
+                              fontFamily: 'BluesSmile'))
+                    ],
+                  ),
+                ),
               ),
-      ),
+            ];
+          },
+          body: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30))),
+            child: loading == true
+                ? systems.loadingBar()
+                : ListView(
+                    children: <Widget>[
+                      _iconLogin(context),
+                      _inputan(),
+                      _btn(context),
+                      _text(context)
+                    ],
+                  ),
+          )),
     );
   }
 
-  _iconLogin() {
+  _iconLogin(BuildContext context) {
     return Container(
-      child: Text('Register',
-          textAlign: TextAlign.left,
-          style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: ColorPalette.underlineTextField)),
-      padding: EdgeInsets.all(20.0),
+      height: MediaQuery.of(context).size.height * 0.25,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        width: double.infinity,
+        child: SvgPicture.asset('asset/img/add_information.svg',
+            semanticsLabel: 'Acme Logo'),
+      ),
     );
   }
 
@@ -167,7 +198,7 @@ class _RegisterPage extends State<RegisterPage> {
           Padding(
             padding: EdgeInsets.only(top: 20.0),
           ),
-          systems.inputNumber(email, 'No HP', Icons.phone),
+          systems.inputNumber(nohp, 'No HP', Icons.phone),
           Padding(
             padding: EdgeInsets.only(top: 20.0),
           ),
@@ -198,18 +229,15 @@ class _RegisterPage extends State<RegisterPage> {
         },
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 15.0),
-          width: 200,
           child: Text(
-            "Register",
+            "Sign Up",
             style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-            ),
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           decoration: BoxDecoration(
             color: ColorPalette.underlineTextField,
-            borderRadius: BorderRadius.circular(30.0),
+            borderRadius: BorderRadius.circular(15.0),
           ),
         ),
       ),
@@ -235,7 +263,7 @@ class _RegisterPage extends State<RegisterPage> {
               setState(() {
                 loading = true;
               });
-              new Timer(const Duration(seconds: 2), () {
+              new Timer(const Duration(seconds: 1), () {
                 Navigator.pushReplacementNamed(context, '/login');
                 setState(() {
                   loading = false;
@@ -245,7 +273,7 @@ class _RegisterPage extends State<RegisterPage> {
             child: Container(
               padding: EdgeInsets.only(left: 5.0, top: 20, bottom: 20),
               child: Text(
-                "Login",
+                "Sign In",
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     color: ColorPalette.underlineTextField, fontSize: 11),
@@ -256,5 +284,4 @@ class _RegisterPage extends State<RegisterPage> {
       ),
     );
   }
-
 }

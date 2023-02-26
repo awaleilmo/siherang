@@ -60,7 +60,7 @@ class _AkunPage extends State<AkunPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // backgroundColor: ColorPalette.underlineTextField,
+        backgroundColor: Colors.white,
         body: Center(
           child: loading == true
               ? Container(

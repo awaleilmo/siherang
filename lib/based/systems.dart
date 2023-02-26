@@ -55,6 +55,7 @@ class systems {
           )
         ],
       );
+
   static inputNumber(control, String name, icons) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -153,6 +154,7 @@ class systems {
           )
         ],
       );
+
   static alertError(context, pesan) => showTopSnackBar(
         context,
         CustomSnackBar.error(
@@ -206,6 +208,23 @@ class systems {
     }
     return result;
   }
+
+  static btnDefault(onTaps, name) => InkWell(
+        onTap: onTaps,
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 15.0),
+          child: Text(
+            name,
+            style: TextStyle(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          decoration: BoxDecoration(
+            color: ColorPalette.underlineTextField,
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+        ),
+      );
 }
 
 Future<bool> checkConnection() async {

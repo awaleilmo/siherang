@@ -8,6 +8,7 @@ import 'package:dlh/based/api.dart';
 import 'package:dlh/based/systems.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,26 +18,28 @@ class AkunPage extends StatefulWidget {
 }
 
 class _AkunPage extends State<AkunPage> {
-  String nama = '';
-  String email = '';
-  String nohp = '';
+  TextEditingController email = new TextEditingController();
+  TextEditingController nama = new TextEditingController();
+  TextEditingController nohp = new TextEditingController();
+  TextEditingController pass = new TextEditingController();
   bool loading = false;
+  bool passwordVisible = false;
 
   @override
   void initState() {
     super.initState();
-    datamenu();
+    dataMenu();
   }
 
-  Future<void> datamenu() async {
+  Future<void> dataMenu() async {
     setState(() {
       loading = true;
     });
     var data = await getDataUser();
     setState(() {
-      nama = data['name'];
-      email = data['email'];
-      nohp = data['nohp'];
+      nama.text = data['name'];
+      email.text = data['email'];
+      nohp.text = data['nohp'];
       loading = false;
     });
   }
@@ -57,201 +60,118 @@ class _AkunPage extends State<AkunPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        // backgroundColor: ColorPalette.underlineTextField,
         body: Center(
-      child: loading == true
-          ? systems.loadingBar()
-          : RefreshIndicator(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(top: 10),
+          child: loading == true
+              ? Container(
+                  color: Colors.white,
+                  child: systems.loadingBar(),
+                )
+              : RefreshIndicator(
+                  child: SafeArea(
+                    child: Container(
+                      child: loading == true
+                          ? systems.loadingBar()
+                          : Column(
+                              children: <Widget>[
+                                _top(),
+                                _inputan(),
+                                _btn(context)
+                              ],
+                            ),
+                    ),
                   ),
-                  _top(),
-                  Padding(
-                    padding: EdgeInsets.only(top: 10),
-                  ),
-                  _center(context)
-                ],
-              ),
-              onRefresh: datamenu,
-            ),
-    ));
+                  onRefresh: dataMenu,
+                ),
+        ));
   }
 
-  Widget _top() {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.90,
-      height: MediaQuery.of(context).size.height * 0.30,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: ColorPalette.underlineTextField,
-        ),
-        alignment: Alignment.center,
-        child: Container(
-          height: MediaQuery.of(context).size.width * 1,
-          width: MediaQuery.of(context).size.height * 0.50,
-          padding: EdgeInsets.only(bottom: 40),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: Colors.white,
-              image: DecorationImage(
-                image: AssetImage('asset/siherang.png'),
-              ),
-            ),
-            //child: Image(image: AssetImage('asset/s1.png'), ),
-          ),
-        ),
+  _title() {
+    return Center(
+      child: ColoredBox(
+        color: ColorPalette.underlineTextField,
+        child: Text("Sign In",
+            style: TextStyle(
+                color: Colors.white, fontSize: 26.0, fontFamily: 'BluesSmile')),
       ),
     );
   }
 
-  Widget _center(context) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-            color: ColorPalette.underlineTextField),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-            ),
-            Text(
-              "My Account",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-            ),
-            Container(
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10)),
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Row(
-                  children: <Widget>[
-                    SizedBox(
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Nama",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              "Email",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              "Telp  ",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ]),
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Expanded(
-                      child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            AutoSizeText(
-                              systems.capitalizeAllWord(nama),
-                              textAlign: TextAlign.left,
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            AutoSizeText(
-                              systems.capitalize(email),
-                              textAlign: TextAlign.left,
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            AutoSizeText(
-                              nohp.toUpperCase(),
-                              textAlign: TextAlign.left,
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ]),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-            ),
-            Center(
-              child: InkWell(
-                  onTap: () async {
-                    logout(context);
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.60,
-                    height: MediaQuery.of(context).size.height * 0.06,
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: AutoSizeText(
-                        "Logout",
-                        minFontSize: 12,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 1.0),
-                        color: Colors.orangeAccent,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                  )),
-            )
-          ],
+  _top() {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: AlignmentDirectional.bottomStart,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: ColorPalette.underlineTextField,
+          ),
+          height: 200.0,
         ),
+        Container(
+          height: 100.0,
+          width: MediaQuery.of(context).size.width * 0.78,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(topRight: Radius.circular(50))),
+        ),
+        Container(
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(topRight: Radius.circular(50))),
+          height: 50.0,
+        ),
+        Container(
+          height: 120,
+          alignment: Alignment.center,
+          child: SvgPicture.asset('asset/img/my_documents.svg'),
+        ),
+        Positioned(
+          top: 25,
+          left: 170,
+          child: _title(),
+        ),
+      ],
+    );
+  }
+
+  _inputan() {
+    return Container(
+      padding: EdgeInsets.all(20.0),
+      child: Column(
+        children: <Widget>[
+          systems.inputText(nama, 'Nama Lengkap', Icons.account_box_rounded),
+          Padding(
+            padding: EdgeInsets.only(top: 20.0),
+          ),
+          systems.inputText(email, 'Email', Icons.email),
+          Padding(
+            padding: EdgeInsets.only(top: 20.0),
+          ),
+          systems.inputNumber(nohp, 'No HP', Icons.phone),
+          Padding(
+            padding: EdgeInsets.only(top: 20.0),
+          ),
+          // Padding(
+          //   padding: EdgeInsets.only(top: 20.0),
+          // ),
+          // systems.inputPassword(pass, 'Passwords', passwordVisible, () {
+          //   setState(() {
+          //     passwordVisible = !passwordVisible;
+          //   });
+          // }),
+        ],
       ),
+    );
+  }
+
+  _btn(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 1,
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: systems.btnDefault(() {
+        logout(context);
+      }, "Logout"),
     );
   }
 }

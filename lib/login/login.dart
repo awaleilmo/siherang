@@ -19,25 +19,37 @@ class _LoginPage extends State<LoginPage> {
   bool passwordVisible = false;
   bool loading = false;
 
+  Timer? timer = Timer(Duration(milliseconds: 1), () {});
+
   TextEditingController user = new TextEditingController();
   TextEditingController pass = new TextEditingController();
   String msg = '';
   String dtid = '';
 
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
   void _proseslogin(context, konteks) async {
     setState(() {
       loading = true;
     });
-    new Timer(const Duration(seconds: 2), () async {
-      var response = await api().login(user.text, pass.text);
-      var data = response['data'];
-      if (response['status'] == 'gagal') {
-        systems.alertError(context, 'Email atau Password salah');
-      } else {
-        await setSession(data[0]['id'].toString(),
-            data[0]['remember_token'].toString(), true);
-        await setDataUser(data[0]);
-        Navigator.pushReplacementNamed(konteks, '/home');
+    timer = new Timer(const Duration(seconds: 1), () async {
+      try {
+        var response = await api().login(user.text, pass.text);
+        var data = response['data'];
+        if (response['status'] == 'gagal') {
+          systems.alertError(context, 'Email atau Password salah');
+        } else {
+          await setSession(data[0]['id'].toString(),
+              data[0]['remember_token'].toString(), true);
+          await setDataUser(data[0]);
+          Navigator.pushReplacementNamed(konteks, '/home');
+        }
+      } catch (e) {
+        systems.alertError(context, "we can't connect to the internet, check if the internet network is connected");
       }
       setState(() {
         loading = false;
@@ -110,7 +122,7 @@ class _LoginPage extends State<LoginPage> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 20),
         width: double.infinity,
-        child: SvgPicture.asset('asset/img/add_information.svg',
+        child: SvgPicture.asset('asset/img/login.svg',
             semanticsLabel: 'Acme Logo'),
       ),
     );
@@ -138,24 +150,9 @@ class _LoginPage extends State<LoginPage> {
   _btn(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(top: 50, right: 20, left: 20),
-      child: InkWell(
-        onTap: () {
-          _proseslogin(Overlay.of(context), context);
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 15.0),
-          child: Text(
-            "Sign In",
-            style: TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-          decoration: BoxDecoration(
-            color: ColorPalette.underlineTextField,
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-        ),
-      ),
+      child: systems.btnDefault(() {
+        _proseslogin(Overlay.of(context), context);
+      }, "Sign In"),
     );
   }
 
@@ -178,7 +175,7 @@ class _LoginPage extends State<LoginPage> {
               setState(() {
                 loading = true;
               });
-              new Timer(const Duration(seconds: 1), () {
+              timer = new Timer(const Duration(seconds: 1), () {
                 Navigator.pushReplacementNamed(context, '/register');
                 setState(() {
                   loading = false;

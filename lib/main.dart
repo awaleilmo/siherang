@@ -38,6 +38,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   bool autol = false;
   String name = '';
   bool keluar = false;
+  late Timer? timer;
 
   @override
   void initState() {
@@ -50,8 +51,14 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
     autoLogIn();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    timer?.cancel();
+  }
+
   autoLogIn() async {
-    new Timer(const Duration(seconds: 3), () async {
+    timer = new Timer(const Duration(seconds: 3), () async {
       bool result = await checkConnection();
       if (result == true) {
         dynamic session = await getSession();
@@ -130,6 +137,13 @@ class Utama extends StatefulWidget {
 
 class _Utama extends State<Utama> {
   bool loading = false;
+  late Timer? timer;
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -160,11 +174,6 @@ class _Utama extends State<Utama> {
       child: Container(
         padding: EdgeInsets.only(top: 20.0, bottom: 20),
         width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius:
-              BorderRadius.only(bottomLeft: const Radius.circular(70.0)),
-        ),
         child: Image.asset(
           "asset/siherang.png",
           fit: BoxFit.contain,
@@ -184,7 +193,7 @@ class _Utama extends State<Utama> {
             setState(() {
               loading = true;
             });
-            new Timer(const Duration(seconds: 1), () {
+            timer = new Timer(const Duration(seconds: 1), () {
               Navigator.pushNamed(context, '/login');
               setState(() {
                 loading = false;
@@ -216,7 +225,7 @@ class _Utama extends State<Utama> {
             setState(() {
               loading = true;
             });
-            new Timer(const Duration(seconds: 1), () {
+            timer = new Timer(const Duration(seconds: 1), () {
               Navigator.pushNamed(context, '/register');
               setState(() {
                 loading = false;

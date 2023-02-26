@@ -1,16 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:dlh/animasi/animasi.dart';
 import 'package:dlh/animasi/constant.dart';
 import 'package:dlh/based/api.dart';
 import 'package:dlh/based/systems.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:http/http.dart' as http;
-
-import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -28,6 +23,7 @@ class _RegisterPage extends State<RegisterPage> {
   TextEditingController pass = new TextEditingController();
   TextEditingController cpass = new TextEditingController();
   String mse = '';
+  Timer? timer = Timer(Duration(milliseconds: 1), () {});
 
   void _loading() {
     setState(() {
@@ -35,11 +31,17 @@ class _RegisterPage extends State<RegisterPage> {
     });
   }
 
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
   void _register(context) async {
     setState(() {
       loading = true;
     });
-    new Timer(const Duration(seconds: 2), () async {
+    timer = new Timer(const Duration(seconds: 1), () async {
       if (nama.text == '') {
         _loading();
         systems.alertError(context, 'Nama Harus diisi');
@@ -85,33 +87,40 @@ class _RegisterPage extends State<RegisterPage> {
         systems.alertError(context, 'Password Tidak Sama');
         return;
       }
-      final response =
-          await api().register(nama.text, email.text, nohp.text, pass.text);
-      if (response['error'] != null) {
-        var emailError = response['error']['email'] ?? null;
-        var noHpError = response['error']['nohp'] ?? null;
-        if (noHpError != null) {
-          systems.alertError(context, noHpError[0]);
+      try {
+        final response =
+            await api().register(nama.text, email.text, nohp.text, pass.text);
+        if (response['error'] != null) {
+          var emailError = response['error']['email'] ?? null;
+          var noHpError = response['error']['nohp'] ?? null;
+          if (noHpError != null) {
+            systems.alertError(context, noHpError[0]);
+          }
+          if (emailError != null) {
+            systems.alertError(context, emailError[0]);
+          }
+        } else if (response['status'] == 'sukses') {
+          setState(() {
+            email.text = '';
+            nama.text = '';
+            nohp.text = '';
+            pass.text = '';
+            cpass.text = '';
+          });
+          systems.alertSuccess(
+              context, 'Berhasil di Daftarkan, silahkan login');
+        } else {
+          systems.alertError(context, 'Terjadi Kesalahan, Coba ulangi lagi');
         }
-        if (emailError != null) {
-          systems.alertError(context, emailError[0]);
-        }
-      } else if (response['status'] == 'sukses') {
-        setState(() {
-          email.text = '';
-          nama.text = '';
-          nohp.text = '';
-          pass.text = '';
-          cpass.text = '';
-        });
-        systems.alertSuccess(context, 'Berhasil di Daftarkan, silahkan login');
-      } else {
-        systems.alertError(context, 'Terjadi Kesalahan, Coba ulangi lagi');
+      } catch (e) {
+        systems.alertError(context,
+            "we can't connect to the internet, check if the internet network is connected");
       }
       setState(() {
         loading = false;
       });
     });
+
   }
 
   @override
@@ -179,7 +188,7 @@ class _RegisterPage extends State<RegisterPage> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 20),
         width: double.infinity,
-        child: SvgPicture.asset('asset/img/add_information.svg',
+        child: SvgPicture.asset('asset/img/personal_information.svg',
             semanticsLabel: 'Acme Logo'),
       ),
     );
@@ -223,24 +232,9 @@ class _RegisterPage extends State<RegisterPage> {
   _btn(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(top: 50, right: 20, left: 20),
-      child: InkWell(
-        onTap: () {
-          _register(Overlay.of(context));
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 15.0),
-          child: Text(
-            "Sign Up",
-            style: TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-          decoration: BoxDecoration(
-            color: ColorPalette.underlineTextField,
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-        ),
-      ),
+      child: systems.btnDefault(() {
+        _register(Overlay.of(context));
+      }, "Sign Up"),
     );
   }
 
@@ -263,12 +257,13 @@ class _RegisterPage extends State<RegisterPage> {
               setState(() {
                 loading = true;
               });
-              new Timer(const Duration(seconds: 1), () {
+              timer = new Timer(const Duration(seconds: 1), () {
                 Navigator.pushReplacementNamed(context, '/login');
                 setState(() {
                   loading = false;
                 });
               });
+
             },
             child: Container(
               padding: EdgeInsets.only(left: 5.0, top: 20, bottom: 20),
